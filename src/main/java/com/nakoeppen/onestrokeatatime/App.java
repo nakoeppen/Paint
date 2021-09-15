@@ -67,7 +67,7 @@ public class App extends Application {
         stage.setMaximized(true);
         ScrollPane scroll = new ScrollPane();
         scroll.setContent(canvas);
-        BorderPane root = new BorderPane(scroll); //Creates layout and sets Canvas in center
+        BorderPane root = new BorderPane(scroll); //Creates layout and sets canvas in center
 
         //Creation of MenuItems
         MenuItem importImage = new MenuItem("Import");
