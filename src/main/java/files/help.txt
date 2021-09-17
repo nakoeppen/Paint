@@ -1,0 +1,12 @@
+This program starts up with an image preloaded that you may edit or save as you
+see fit. However, it also has the option of importing images into the program,
+which you can do by clicking "File" in the Top Menu Bar, and then clicking 
+"Import Image". This will come up with a File Browser Prompt, in which you can
+find the file you wish to edit, and then click on it, and click "Open". 
+Depending on the resolution of the image, you may see a prompt asking you if you
+would like to have the program automatically resize the image to fit your 
+screen. It is recommend that you do this for ease of use, but if you do not 
+choose "Yes" to this prompt, there are scroll bars in order to navigate the 
+image as you please. Furthermore, there is still an option called "Fit to 
+Screen" under the "Edit" tab in the Top Menu Bar, which will resize the image 
+accordingly. 

@@ -1,0 +1,28 @@
+SPRINT #3
+
+DONE ~ * A pencil tool (freehand drawing of a line) in addition to drawing a straight line  (OR, if you have this, the "straight line" tool)
+DONE ~ * Width and color selection should work for both pencil and line tools.
+DONE * Draw a square, a rectangle, an ellipse, and a circle, with fill    (don't forget color for inside and the edge of the shape).
+MOSTLY DONE ~ * "Smart" save ("you've made changes...")
+DONE ~ * Multiple image file types (open and save) - at least 3.
+*SOMEWHAT CHALLENGING * Keyboard UI controls (control S/Save, alt F/File menu, etc)
+MOSTLY DONE ~ * A text label describing the color.
+*SOMEWHAT EASY * Color "grabber"/dropper tool.
+*SOMEWHAT CHALLENGING * Resize canvas (and resulting image) and zoom in/out.
+
+MOSTLY DONE * Tabs
+*EASY Sorry: forgot one: Text tool
+
+That's 90+ stuff. 
+
+-----------------------------------
+
+-----------------------------------
+
+Reach goal, optional for 90+ NOT required but cool/good add:
+* Transparency handling if applicable.  
+
+Worthwhile? extra credit for this if you can do it without data loss risks (as in, saving from a transparent to no-transparency format)
+
+FUTURE REQUIREMENTS:
+* Undo using a stack (not the built in library for images, but rather the general abstract/data type)

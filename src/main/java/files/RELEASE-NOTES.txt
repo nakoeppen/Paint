@@ -1,0 +1,72 @@
+One Stroke at a Time RELEASE NOTES VERSION 0.3.0
+
+Author: Nicholas Alexander Koeppen
+
+Date: September 24th, 2021
+
+New Features:
+-Red X (Close Button) now also gives Quit Button Save Prompt
+-Tabs
+-Can draw a square, rectangle, ellipse, and circle
+
+Future Planned Additions:
+-Preferences button, with config file
+
+Known Bugs:
+-Tabs need to be saved individually
+
+Links:
+https://github.com/nkoeppen/OneStrokeAtATime.git
+-------------------------------------------------------------------------------
+One Stroke at a Time RELEASE NOTES VERSION 0.2.0
+
+Author: Nicholas Alexander Koeppen
+
+Date: September 14th, 2021
+
+New Features:
+-Refaced Menu to be more styled more traditionally
+-Renamed program from PaInt to One Stroke at a Time
+-Created a BestCanvas class to better suite my program
+-Created a Save and Save As... Button (can save as .JPG, .PNG, .GIF, .BMP)
+-Created a Reset Canvas Button
+-Created an About Button to see details about program
+-Created a Help Button to see how to use program
+-Created a Release Notes Button to see this file from within program
+-Created a Drawing Toolbar on left side
+-Drawing sidebar has buttons/fields to change width, color, and drawing style 
+-Added ability to draw on the canvas
+
+Future Planned Additions:
+-Preferences button, with config file
+
+Known Bugs:
+-None
+
+Links:
+https://github.com/nkoeppen/OneStrokeAtATime.git
+-------------------------------------------------------------------------------
+PaInt RELEASE NOTES VERSION 0.1.0
+
+Author: Nicholas Alexander Koeppen
+
+Date: September 9th, 2021
+
+New Features:
+-Can import image files and resize them appropriately to screen
+-Can exit properly
+-Set up for future potential editing of images
+-Clean and centered GUI, very simplistic to use
+-Temporarily named PaInt
+
+Future Planned Additions:
+-Saving image
+-Additions to Menu Bar
+-Reset Canvas Button
+-Better name
+
+Known Bugs:
+-None
+
+Links:
+-None

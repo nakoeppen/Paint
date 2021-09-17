@@ -1,39 +1,25 @@
 //Nicholas Koeppen
-//Main class for pain(t) program
+//Main class for One Stroke at a Time program
 package com.nakoeppen.onestrokeatatime;
 
 //JavaFX General
-import java.awt.image.RenderedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.function.UnaryOperator;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
-import javafx.scene.canvas.*;
 import javafx.scene.control.*;
-import javafx.scene.image.*;
+import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javax.imageio.ImageIO;
 
-//Unused imports but potentially needed for future
-//import javafx.scene.paint.*;
 public class App extends Application {
 
-    protected Stage stage;
-    protected BestCanvas canvas;
-    protected String filepath;
+    private Stage stage;
+    private String imageFilepath;
 
     //Starts the program
     public static void main(String[] args) {
@@ -41,225 +27,207 @@ public class App extends Application {
     }
 
     @Override
-    public void start(Stage other) {
-        //Creates Canvas for Image Painting (in future)
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        canvas = new BestCanvas(screenBounds.getWidth() - 75, screenBounds.getHeight() - 75);
+    public void start(Stage stage) {
+        //Creates TabPane
+        PaintTabPane tabPane = new PaintTabPane(new PaintTab());
 
         //Setting the stage
-        stage = other;
+        this.stage = stage;
         stage.setTitle("One Stroke at a Time"); //Program Header
         stage.setMaximized(true);
-        ScrollPane canvasScroll = new ScrollPane();
-        canvasScroll.setContent(canvas);
-        BorderPane root = new BorderPane(canvasScroll); //Creates layout and sets canvas in center
+        BorderPane root = new BorderPane(tabPane); //Creates layout and sets paintList in center
 
-        //Creation of MenuItems
+        //Creation of Top MenuItems
+        //File
         MenuItem importImage = new MenuItem("Import");
+        MenuItem save = new MenuItem("Save");
         MenuItem saveAs = new MenuItem("Save As...");
-        MenuItem save = new MenuItem("Save"); //Needs Action
         MenuItem quit = new MenuItem("Quit");
+        //Edit
         MenuItem fitToScreen = new MenuItem("Fit Image to Screen");
         MenuItem clearCanvas = new MenuItem("Clear Canvas");
-        MenuItem about = new MenuItem("About"); //Needs Action
-        MenuItem help = new MenuItem("Help"); //Needs Action
+        MenuItem addTab = new MenuItem("Add Tab");
+        MenuItem removeTab = new MenuItem("Remove Tab");
+        //Help
+        MenuItem help = new MenuItem("Help");
+        MenuItem releaseNotes = new MenuItem("Release Notes");
+        MenuItem about = new MenuItem("About");
 
-        //Sets action of MenuItems
-        importImage.setOnAction(new ImportImage());
-        save.setOnAction(new SaveImage());
-        saveAs.setOnAction(new SaveAs());
-        quit.setOnAction(new QuitPaint());
-        fitToScreen.setOnAction(new FitToScreen());
-        clearCanvas.setOnAction(new ClearCanvas());
-
-        //Creates and compiles the menu bar
-        Menu fileMenu = new Menu("File", null, importImage, saveAs, save, quit);
-        Menu editMenu = new Menu("Edit", null, fitToScreen, clearCanvas);
-        Menu helpMenu = new Menu("Help", null, help, about);
-        MenuBar topMenu = new MenuBar(fileMenu, editMenu, helpMenu);
-
-        //Compiles, finalizes, and shows Layout on Stage
-        root.setTop(topMenu); //Sets Menu up top
-        stage.setScene(new Scene(root));
-        stage.show();
-    }
-
-    //Saves Image
-    private void saveImage(File file) {
-        WritableImage writableImage = new WritableImage((int) canvas.getWidth(), (int) canvas.getHeight());
-        canvas.snapshot(null, writableImage); //Takes snapshot of canvas
-        RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
-
-        //Gets File Extension (portable, if future revisions let you save as JPG)
-        String fileType = file.getName().substring(file.getName().lastIndexOf('.') + 1);
-
-        //Writes Image to File
-        try {
-            ImageIO.write(renderedImage, fileType, file);
-        } catch (IOException ex) {
-            System.out.println("Save Image Error");
-            System.exit(-1);
-        }
-    }
-
-    //Gets Save File for Image
-    private File getFile(boolean forSave) {
-        FileChooser fileChooser = new FileChooser();
-        File file;
-
-        if (forSave) {
-            fileChooser.setTitle("Save Image File");
-
-            //Pushes user to select an image-type file
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("PNG", "*.png"));
-
-            file = fileChooser.showSaveDialog(stage);
-        } else {
-            fileChooser.setTitle("Open Image File");
-
-            //Pushes user to select an image-type file
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif", "*.bmp"),
-                    new FileChooser.ExtensionFilter("All Files", "*.*"));
-            file = fileChooser.showOpenDialog(stage);
-        }
-
-        //Makes sure that user input an image file, and if no file then verifies that they wanted to do that
-        if (file == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "No file was input. Would you like to try again?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait();
-            if (alert.getResult() == ButtonType.YES && forSave) {
-                file = fileChooser.showSaveDialog(stage);
-            } else if (alert.getResult() == ButtonType.YES && forSave) {
-                file = fileChooser.showOpenDialog(stage);
-            }
-        }
-        return file;
-    }
-
-    //Creates Text Reader Windows
-    public void createTextPopup(File file, String title) throws FileNotFoundException {
-        //Does the set up for popup
-        Stage popup = new Stage();
-        BorderPane pane = new BorderPane();
-        ScrollPane textScroll = new ScrollPane();
-        HBox topMenu = new HBox();
-        Scene scene = new Scene(pane, 600, 600);
-
-        //Reads text
-        String message = "";
-        try ( BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                message += line;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Text text = new Text(message);
-
-        //Creates close button
-        Button close = new Button("Close");
-        close.setOnAction((ActionEvent e) -> {
-            popup.hide();
+        //Sets action of Top MenuItems
+        //File
+        importImage.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().importImage(FileTools.getFile(false, stage).toURI().toString());
         });
-
-        //Compiles and finalizes layout
-        topMenu.getChildren().addAll(close);
-        //topMenu.setAlignment(Pos.CENTER);
-        textScroll.setContent(text);
-        pane.setTop(topMenu);
-        pane.setCenter(textScroll);
-        popup.setScene(scene);
-        popup.setTitle(title);
-        popup.show();
-    }
-
-//Creates action on ImportImage Button
-    private class ImportImage implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            File file = getFile(false);
-
-            if (file != null) {
-                canvas.paintCanvas(new Image(file.toURI().toString())); //Takes filepath of image, passes it to Image constructor, and paints the canvas with it
-            }
-
-        }
-
-    }
-
-//Creates action on Fit To Screen Button
-    private class FitToScreen implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            canvas.resetCanvas();
-            canvas.fitToScreen();
-            canvas.getGraphicsContext2D().drawImage(canvas.getImage(), 0, 0, canvas.getWidth(), canvas.getHeight());
-        }
-    }
-
-//Creates action on Clear Canvas Button
-    private class ClearCanvas implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            canvas.resetCanvas();
-        }
-    }
-
-//Creates action on Save Button
-    private class SaveImage implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            if (filepath == null) {
+        save.setOnAction((ActionEvent e) -> {
+            if (imageFilepath == null) {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "You need to create a save file first.", ButtonType.OK, ButtonType.CANCEL);
                 alert.showAndWait();
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 if (alert.getResult() == ButtonType.OK) {
-                    filepath = getFile(true).getAbsolutePath();
-                    saveImage(new File(filepath));
+                    imageFilepath = FileTools.getFile(true, stage).getAbsolutePath();
+                    tabPane.getPaintTab().getPaint().saveImage(new File(imageFilepath));
                 }
             } else {
-                saveImage(new File(filepath));
+                tabPane.getPaintTab().getPaint().saveImage(new File(imageFilepath));
             }
-        }
-    }
-
-//Creates action on Save As Button
-    private class SaveAs implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            File file = getFile(true);
+        });
+        saveAs.setOnAction((ActionEvent e) -> {
+            File file = FileTools.getFile(true, stage);
             if (file != null) {
-                saveImage(file);
-                filepath = file.getAbsolutePath();
+                tabPane.getPaintTab().getPaint().saveImage(file);
+                imageFilepath = file.getAbsolutePath();
             } else {
                 System.out.println("File is null"); //Displays Error
             }
-        }
+        });
+        quit.setOnAction((ActionEvent e) -> {
+            quitPaint(tabPane);
+        });
+        //Edit
+        fitToScreen.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().fitToScreen();
+        });
+        clearCanvas.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().importImage(null);
+            tabPane.getPaintTab().getPaint().resetCanvas();
+        });
+        addTab.setOnAction((ActionEvent e) -> {
+            tabPane.addPaintTab(new Paint());
+        });
+        removeTab.setOnAction((ActionEvent e) -> {
+            tabPane.removePaintTab();
+        });
+        //Help
+        help.setOnAction((ActionEvent e) -> {
+            try {
+                InfoPopup helpPopup = new InfoPopup(new File("src/main/java/files/help.txt"), "Help");
+                helpPopup.show();
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        releaseNotes.setOnAction((ActionEvent e) -> {
+            try {
+                InfoPopup releaseNotesPopup = new InfoPopup(new File("src/main/java/files/RELEASE-NOTES.txt"), "Help");
+                releaseNotesPopup.show();
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        about.setOnAction((ActionEvent e) -> {
+            try {
+                InfoPopup aboutPopup = new InfoPopup(new File("src/main/java/files/about.txt"), "About");
+                aboutPopup.show();
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        //Creates and compiles the Top Menu Bar
+        Menu fileMenu = new Menu("File", null, importImage, saveAs, save, quit);
+        Menu editMenu = new Menu("Edit", null, fitToScreen, clearCanvas, addTab, removeTab);
+        Menu helpMenu = new Menu("Help", null, help, releaseNotes, about);
+        MenuBar topMenu = new MenuBar(fileMenu, editMenu, helpMenu);
+
+        //Change Color Feature
+        ColorPicker colorPicker = new ColorPicker();
+        colorPicker.getStyleClass().add("button");
+        colorPicker.setMaxWidth(150);
+        colorPicker.setOnAction((event) -> {
+            tabPane.getPaintTab().getPaint().setLineColor(colorPicker.getValue());
+        });
+
+        //Creates Buttons for sidebar
+        Button noDraw = new Button("No Drawing");
+        noDraw.setMaxWidth(150);
+        Button drawStraight = new Button("Straight");
+        drawStraight.setMaxWidth(150);
+        Button drawFreehand = new Button("Freehand");
+        drawFreehand.setMaxWidth(150);
+        Button drawSquare = new Button("Square");
+        drawSquare.setMaxWidth(150);
+        Button drawRectangle = new Button("Rectangle");
+        drawRectangle.setMaxWidth(150);
+        Button drawEllipse = new Button("Ellipse");
+        drawEllipse.setMaxWidth(150);
+        Button drawCircle = new Button("Circle");
+        drawCircle.setMaxWidth(150);
+        Button fill = new Button("Fill");
+        fill.setMaxWidth(150);
+
+        //Sets Action for Buttons on Sidebar
+        noDraw.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.NODRAW);
+        });
+        drawStraight.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.STRAIGHT);
+        });
+        drawFreehand.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.FREEHAND);
+        });
+        drawSquare.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.SQUARE);
+        });
+        drawRectangle.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.RECTANGLE);
+        });
+        drawEllipse.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.ELLIPSE);
+        });
+        drawCircle.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.CIRCLE);
+        });
+        fill.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().toggleFill();
+        });
+
+        //Creates Text Field and Update Button to Change Width
+        TextField lineWidthField = new TextField("Line Width");
+        lineWidthField.setMaxWidth(150);
+        Button updateLineWidth = new Button("Update Width");
+        updateLineWidth.setMaxWidth(150);
+
+        //Makes sure Line Width Text Field is numbers only
+        UnaryOperator<Change> integerFilter = change -> {
+            String input = change.getText();
+            if (input.matches("[0-9]*")) {
+                return change;
+            }
+            return null;
+        };
+
+        //Sets action for Line Width Update Button
+        updateLineWidth.setOnAction((event) -> {
+            lineWidthField.setTextFormatter(new TextFormatter<String>(integerFilter));
+            tabPane.getPaintTab().getPaint().setLineWidth(Double.parseDouble(lineWidthField.getText()));
+        });
+
+        //Creates a Vertical Toolbar
+        ToolBar sidebar = new ToolBar(colorPicker, lineWidthField, 
+                updateLineWidth, noDraw, drawStraight, drawFreehand,
+                drawSquare, drawRectangle, drawEllipse, drawCircle, fill);
+        sidebar.setOrientation(Orientation.VERTICAL);
+
+        //Compiles, finalizes, and shows Layout on Stage
+        root.setTop(topMenu); //Sets Top Menu on Top
+        root.setLeft(sidebar); //Sets Side Menu on Left
+        stage.setScene(new Scene(root));
+        stage.setOnCloseRequest((event) -> { //Makes stage do Quit procedure on close event
+            quitPaint(tabPane);
+        });
+        stage.show();
     }
 
-//Creates action on Quit Button, and makes sure that user wants to quit
-    private class QuitPaint implements EventHandler<ActionEvent> {
-
-        @Override
-        public void handle(ActionEvent event) {
-            Alert alert = new Alert(Alert.AlertType.NONE, "Do you want to save the image before you quit?", ButtonType.YES, ButtonType.NO);
-            alert.showAndWait();
-            if (alert.getResult() == ButtonType.YES) {
-                if (filepath == null) {
-                    filepath = getFile(true).getAbsolutePath();
-                }
-                saveImage(new File(filepath));
-            } else {
-                System.exit(0);
+    //Quits Paint
+    public void quitPaint(PaintTabPane tabPane) {
+        Alert alert = new Alert(Alert.AlertType.NONE, "Do you want to save the image before you quit?", ButtonType.YES, ButtonType.NO);
+        alert.showAndWait();
+        if (alert.getResult() == ButtonType.YES) {
+            if (imageFilepath == null) {
+                imageFilepath = FileTools.getFile(true, stage).getAbsolutePath();
             }
+            tabPane.getPaintTab().getPaint().saveImage(new File(imageFilepath));
+        } else {
+            System.exit(0);
         }
     }
 }

@@ -1,0 +1,5 @@
+This program was written by Nicholas Koeppen in order to do light image editing.
+Please see "Release Notes" if you would like to see new additions to the 
+program. You may also see "Help" in order to learn more about how to use this 
+program. Have fun, and be sure to take things One Stroke at a Time. 
+
