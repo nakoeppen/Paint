@@ -5,12 +5,12 @@ DONE ~ * Width and color selection should work for both pencil and line tools.
 DONE * Draw a square, a rectangle, an ellipse, and a circle, with fill    (don't forget color for inside and the edge of the shape).
 MOSTLY DONE ~ * "Smart" save ("you've made changes...")
 DONE ~ * Multiple image file types (open and save) - at least 3.
-*SOMEWHAT CHALLENGING * Keyboard UI controls (control S/Save, alt F/File menu, etc)
-MOSTLY DONE ~ * A text label describing the color.
+DONE * Keyboard UI controls (control S/Save, alt F/File menu, etc)
+DONE ~ * A text label describing the color.
 *SOMEWHAT EASY * Color "grabber"/dropper tool.
 *SOMEWHAT CHALLENGING * Resize canvas (and resulting image) and zoom in/out.
 
-MOSTLY DONE * Tabs
+DONE * Tabs
 *EASY Sorry: forgot one: Text tool
 
 That's 90+ stuff. 
