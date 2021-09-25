@@ -39,10 +39,10 @@ public class App extends Application {
 
         //Creation of Top MenuItems
         //File
-        MenuItem importImage = new MenuItem("Import");
-        MenuItem save = new MenuItem("Save");
+        MenuItem importImage = new MenuItem("_Import");
+        MenuItem save = new MenuItem("_Save");
         MenuItem saveAs = new MenuItem("Save As...");
-        MenuItem quit = new MenuItem("Quit");
+        MenuItem quit = new MenuItem("_Quit");
         //Edit
         MenuItem fitToScreen = new MenuItem("Fit Image to Screen");
         MenuItem clearCanvas = new MenuItem("Clear Canvas");
@@ -123,7 +123,7 @@ public class App extends Application {
         });
 
         //Creates and compiles the Top Menu Bar
-        Menu fileMenu = new Menu("File", null, importImage, saveAs, save, quit);
+        Menu fileMenu = new Menu("_File", null, importImage, saveAs, save, quit);
         Menu editMenu = new Menu("Edit", null, fitToScreen, clearCanvas, addTab, removeTab);
         Menu helpMenu = new Menu("Help", null, help, releaseNotes, about);
         MenuBar topMenu = new MenuBar(fileMenu, editMenu, helpMenu);
