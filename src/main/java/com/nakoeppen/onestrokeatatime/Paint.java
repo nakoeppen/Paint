@@ -21,9 +21,9 @@ public class Paint extends Canvas {
     private Image image;
     public final static int NODRAW = 0, STRAIGHT = 1, FREEHAND = 2,
             SQUARE = 3, RECTANGLE = 4, ELLIPSE = 5, CIRCLE = 6;
-    private boolean fill; 
+    private boolean fill, unsavedChanges; 
     private int lineType;
-    private String filepath;
+    private File saveFile;
     private GraphicsContext gc;
 
     //Easy Constructor
@@ -66,11 +66,11 @@ public class Paint extends Canvas {
             this.setHeight(image.getHeight());
         }
         this.gc.drawImage(this.image, 0, 0, this.getWidth(), this.getHeight()); //Draws Image
+        this.unsavedChanges = true;
     }
 
     public void importImage(String filepath) {
-        this.filepath = filepath;
-        this.image = new Image(this.filepath);
+        this.image = new Image(filepath);
         if (image != null) {
             drawImageOnCanvas();
         }
@@ -82,6 +82,7 @@ public class Paint extends Canvas {
         this.setWidth(screenBounds.getWidth() - 75);
         this.setHeight(screenBounds.getHeight() - 75);
         this.gc.clearRect(0, 0, this.getWidth(), this.getHeight());
+        this.unsavedChanges = true;
     }
 
     //Fits the Canvas and Image to Screen
@@ -95,20 +96,22 @@ public class Paint extends Canvas {
         this.setHeight(this.image.getHeight() * minRatio);
 
         this.gc.drawImage(this.getImage(), 0, 0, this.getWidth(), this.getHeight());
+        this.unsavedChanges = true;
     }
 
-    //Saves Image
-    public void saveImage(File file) {
+    //Saves Image when file is passed to it
+    public void saveImage() {
         WritableImage writableImage = new WritableImage((int) this.getWidth(), (int) this.getHeight());
         this.snapshot(null, writableImage); //Takes snapshot of canvas
         BufferedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, new BufferedImage((int) this.getWidth(), (int) this.getHeight(), BufferedImage.TYPE_INT_RGB));
 
         //Gets File Extension (portable, if future revisions let you save as JPG)
-        String fileType = file.getName().substring(file.getName().lastIndexOf('.') + 1);
+        String fileType = saveFile.getName().substring(saveFile.getName().lastIndexOf('.') + 1);
 
         //Writes Image to File
         try {
-            ImageIO.write(renderedImage, fileType, file);
+            ImageIO.write(renderedImage, fileType, saveFile);
+            this.unsavedChanges = false;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -143,6 +146,26 @@ public class Paint extends Canvas {
     //Sets Line Width
     public void setLineWidth(double width) {
         this.gc.setLineWidth(width / 10);
+    }
+    
+    //Gets Save Location
+    public File getSaveFile() {
+        return saveFile;
+    }
+    
+    //Sets Save Location
+    public void setSaveFile(File saveFile) {
+        this.saveFile = saveFile;
+    }
+    
+    //Returns true if there are unsavedChanges
+    public boolean getUnsavedChanges() {
+        return unsavedChanges;
+    }
+    
+    //Sets unsavedChanges for Draw class
+    public void setUnsavedChanges(boolean unsavedChanges) {
+        this.unsavedChanges = unsavedChanges;
     }
     
     //Returns fill boolean

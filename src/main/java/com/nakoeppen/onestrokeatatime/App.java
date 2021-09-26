@@ -19,7 +19,6 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     private Stage stage;
-    private String imageFilepath;
 
     //Starts the program
     public static void main(String[] args) {
@@ -59,22 +58,22 @@ public class App extends Application {
             tabPane.getPaintTab().getPaint().importImage(FileTools.getFile(false, stage).toURI().toString());
         });
         save.setOnAction((ActionEvent e) -> {
-            if (imageFilepath == null) {
+            if (tabPane.getPaintTab().getPaint().getSaveFile() == null) {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "You need to create a save file first.", ButtonType.OK, ButtonType.CANCEL);
                 alert.showAndWait();
                 if (alert.getResult() == ButtonType.OK) {
-                    imageFilepath = FileTools.getFile(true, stage).getAbsolutePath();
-                    tabPane.getPaintTab().getPaint().saveImage(new File(imageFilepath));
+                    tabPane.getPaintTab().getPaint().setSaveFile(FileTools.getFile(true, stage));
+                    tabPane.getPaintTab().getPaint().saveImage();
                 }
             } else {
-                tabPane.getPaintTab().getPaint().saveImage(new File(imageFilepath));
+                tabPane.getPaintTab().getPaint().saveImage();
             }
         });
         saveAs.setOnAction((ActionEvent e) -> {
             File file = FileTools.getFile(true, stage);
             if (file != null) {
-                tabPane.getPaintTab().getPaint().saveImage(file);
-                imageFilepath = file.getAbsolutePath();
+                tabPane.getPaintTab().getPaint().setSaveFile(file);
+                tabPane.getPaintTab().getPaint().saveImage();
             } else {
                 System.out.println("File is null"); //Displays Error
             }
@@ -202,7 +201,7 @@ public class App extends Application {
         });
 
         //Creates a Vertical Toolbar
-        ToolBar sidebar = new ToolBar(colorPicker, lineWidthField, 
+        ToolBar sidebar = new ToolBar(colorPicker, lineWidthField,
                 updateLineWidth, noDraw, drawStraight, drawFreehand,
                 drawSquare, drawRectangle, drawEllipse, drawCircle, fill);
         sidebar.setOrientation(Orientation.VERTICAL);
@@ -219,15 +218,18 @@ public class App extends Application {
 
     //Quits Paint
     public void quitPaint(PaintTabPane tabPane) {
-        Alert alert = new Alert(Alert.AlertType.NONE, "Do you want to save the image before you quit?", ButtonType.YES, ButtonType.NO);
-        alert.showAndWait();
-        if (alert.getResult() == ButtonType.YES) {
-            if (imageFilepath == null) {
-                imageFilepath = FileTools.getFile(true, stage).getAbsolutePath();
+        for (int i = 0; i < tabPane.getTabs().size(); i++) {
+            if (tabPane.getPaintTab(i).getPaint().getUnsavedChanges()) {
+                Alert alert = new Alert(Alert.AlertType.NONE, "Canvas #" + (i + 1) + " has unsaved changes. Would you like to save it?", ButtonType.YES, ButtonType.NO);
+                alert.showAndWait();
+                if (alert.getResult() == ButtonType.YES) {
+                    if (tabPane.getPaintTab(i).getPaint().getSaveFile() == null) {
+                        tabPane.getPaintTab(i).getPaint().setSaveFile(FileTools.getFile(true, stage));
+                    }
+                    tabPane.getPaintTab(i).getPaint().saveImage();
+                }
             }
-            tabPane.getPaintTab().getPaint().saveImage(new File(imageFilepath));
-        } else {
-            System.exit(0);
         }
+        System.exit(0);
     }
 }

@@ -2,18 +2,23 @@ One Stroke at a Time RELEASE NOTES VERSION 0.3.0
 
 Author: Nicholas Alexander Koeppen
 
-Date: September 24th, 2021
+Date: September 26th, 2021
 
 New Features:
 -Red X (Close Button) now also gives Quit Button Save Prompt
 -Tabs
--Can draw a square, rectangle, ellipse, and circle
+-Save prompt now does through all tabs and makes sure each one is saved
+-Can draw a square, rectangle, ellipse, and circle (can draw filled or unfilled)
+-Has Minor Keyboard UI controls for the File menu (Alt+f+...)
+-Renamed and reorganized some classes for better structure
 
 Future Planned Additions:
 -Preferences button, with config file
+-Undo/Redo Button
+-Splitting up GUI code into other class files (i.e., for Menu bar and Toolbar)
 
 Known Bugs:
--Tabs need to be saved individually
+-None
 
 Links:
 https://github.com/nkoeppen/OneStrokeAtATime.git

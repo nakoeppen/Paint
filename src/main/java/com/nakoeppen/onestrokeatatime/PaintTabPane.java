@@ -26,6 +26,11 @@ public class PaintTabPane extends TabPane {
     public PaintTab getPaintTab() {
         return (PaintTab)this.getTabs().get(this.getSelectionModel().getSelectedIndex());
     }
+    
+    //Returns Paint object in given index
+    public PaintTab getPaintTab(int index) {
+        return (PaintTab)this.getTabs().get(index);
+    }
 
     public int getSize() {
         return this.getTabs().size();

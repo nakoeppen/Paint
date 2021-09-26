@@ -4,12 +4,9 @@ package com.nakoeppen.onestrokeatatime;
 
 public class Draw {
 
-    private Paint paint;
     private double startX, startY;
 
     public Draw(Paint paint) {
-        this.paint = paint;
-
         //Sets Mouse Listener for Drawing
         paint.setOnMousePressed((event) -> {
             if (paint.getLineType() != Paint.NODRAW) {
@@ -59,6 +56,7 @@ public class Draw {
                         paint.getGraphicsContext2D().strokeOval(startX, startY, event.getX() - startX, event.getX() - startX);
                     }
                 }
+                paint.setUnsavedChanges(true);
             }
         });
     }

@@ -3,7 +3,7 @@ SPRINT #3
 DONE ~ * A pencil tool (freehand drawing of a line) in addition to drawing a straight line  (OR, if you have this, the "straight line" tool)
 DONE ~ * Width and color selection should work for both pencil and line tools.
 DONE * Draw a square, a rectangle, an ellipse, and a circle, with fill    (don't forget color for inside and the edge of the shape).
-MOSTLY DONE ~ * "Smart" save ("you've made changes...")
+DONE ~ * "Smart" save ("you've made changes...")
 DONE ~ * Multiple image file types (open and save) - at least 3.
 DONE * Keyboard UI controls (control S/Save, alt F/File menu, etc)
 DONE ~ * A text label describing the color.
