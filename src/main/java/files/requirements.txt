@@ -7,11 +7,11 @@ DONE ~ * "Smart" save ("you've made changes...")
 DONE ~ * Multiple image file types (open and save) - at least 3.
 DONE * Keyboard UI controls (control S/Save, alt F/File menu, etc)
 DONE ~ * A text label describing the color.
-*SOMEWHAT EASY * Color "grabber"/dropper tool.
-*SOMEWHAT CHALLENGING * Resize canvas (and resulting image) and zoom in/out.
+*DONE * Color "grabber"/dropper tool.
+*BUGGY * Resize canvas (and resulting image) and zoom in/out.
 
 DONE * Tabs
-*EASY Sorry: forgot one: Text tool
+DONE * Sorry: forgot one: Text tool
 
 That's 90+ stuff. 
 

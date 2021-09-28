@@ -5,15 +5,15 @@ package com.nakoeppen.onestrokeatatime;
 //JavaFX General
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.function.UnaryOperator;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.TextFormatter.Change;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -98,24 +98,21 @@ public class App extends Application {
         //Help
         help.setOnAction((ActionEvent e) -> {
             try {
-                InfoPopup helpPopup = new InfoPopup(new File("src/main/java/files/help.txt"), "Help");
-                helpPopup.show();
+                Popup.infoPopup(new File("src/main/java/files/help.txt"), "Help");
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
         });
         releaseNotes.setOnAction((ActionEvent e) -> {
             try {
-                InfoPopup releaseNotesPopup = new InfoPopup(new File("src/main/java/files/RELEASE-NOTES.txt"), "Help");
-                releaseNotesPopup.show();
+                Popup.infoPopup(new File("src/main/java/files/RELEASE-NOTES.txt"), "Help");
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
         });
         about.setOnAction((ActionEvent e) -> {
             try {
-                InfoPopup aboutPopup = new InfoPopup(new File("src/main/java/files/about.txt"), "About");
-                aboutPopup.show();
+                Popup.infoPopup(new File("src/main/java/files/about.txt"), "About");
             } catch (FileNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
@@ -128,7 +125,7 @@ public class App extends Application {
         MenuBar topMenu = new MenuBar(fileMenu, editMenu, helpMenu);
 
         //Change Color Feature
-        ColorPicker colorPicker = new ColorPicker();
+        ColorPicker colorPicker = new ColorPicker(Color.BLACK);
         colorPicker.getStyleClass().add("button");
         colorPicker.setMaxWidth(150);
         colorPicker.setOnAction((event) -> {
@@ -136,6 +133,8 @@ public class App extends Application {
         });
 
         //Creates Buttons for sidebar
+        Button chooseColorAtPoint = new Button("Color from Point");
+        chooseColorAtPoint.setMaxWidth(150);
         Button noDraw = new Button("No Drawing");
         noDraw.setMaxWidth(150);
         Button drawStraight = new Button("Straight");
@@ -146,14 +145,25 @@ public class App extends Application {
         drawSquare.setMaxWidth(150);
         Button drawRectangle = new Button("Rectangle");
         drawRectangle.setMaxWidth(150);
+        Button drawRoundedRectangle = new Button("Rounded Rectangle");
+        drawRoundedRectangle.setMaxWidth(150);
         Button drawEllipse = new Button("Ellipse");
         drawEllipse.setMaxWidth(150);
         Button drawCircle = new Button("Circle");
         drawCircle.setMaxWidth(150);
+        Button drawText = new Button("Text");
+        drawText.setMaxWidth(150);
         Button fill = new Button("Fill");
         fill.setMaxWidth(150);
+        Button zoomIn = new Button("Zoom In");
+        zoomIn.setMaxWidth(150);
+        Button zoomOut = new Button("Zoom Out");
+        zoomOut.setMaxWidth(150);
 
         //Sets Action for Buttons on Sidebar
+        chooseColorAtPoint.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.COLORATPOINT);
+        });
         noDraw.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.NODRAW);
         });
@@ -169,41 +179,45 @@ public class App extends Application {
         drawRectangle.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.RECTANGLE);
         });
+        drawRoundedRectangle.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.ROUNDEDRECTANGLE);
+        });
         drawEllipse.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.ELLIPSE);
         });
         drawCircle.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.CIRCLE);
         });
+        drawText.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.TEXT);
+        });
         fill.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().toggleFill();
         });
+        zoomIn.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().adjustZoom(true);
+        });
+        zoomOut.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().adjustZoom(false);
+        });
 
-        //Creates Text Field and Update Button to Change Width
-        TextField lineWidthField = new TextField("Line Width");
-        lineWidthField.setMaxWidth(150);
-        Button updateLineWidth = new Button("Update Width");
-        updateLineWidth.setMaxWidth(150);
-
-        //Makes sure Line Width Text Field is numbers only
-        UnaryOperator<Change> integerFilter = change -> {
-            String input = change.getText();
-            if (input.matches("[0-9]*")) {
-                return change;
-            }
-            return null;
-        };
-
-        //Sets action for Line Width Update Button
-        updateLineWidth.setOnAction((event) -> {
-            lineWidthField.setTextFormatter(new TextFormatter<String>(integerFilter));
-            tabPane.getPaintTab().getPaint().setLineWidth(Double.parseDouble(lineWidthField.getText()));
+        //Uses Slider to change Line Width
+        Label lineWidthLabel = new Label("Change Line Width");
+        lineWidthLabel.setMaxWidth(150);
+        Slider lineWidthSlider = new Slider(10, 300, 10);
+        lineWidthSlider.setMaxWidth(150);
+        
+         //Adds action to slider value change
+        lineWidthSlider.valueProperty().addListener((ObservableValue <? extends 
+                Number> observable, Number oldValue, Number newValue) -> {
+            tabPane.getPaintTab().getPaint().setLineWidth((double)newValue);
         });
 
         //Creates a Vertical Toolbar
-        ToolBar sidebar = new ToolBar(colorPicker, lineWidthField,
-                updateLineWidth, noDraw, drawStraight, drawFreehand,
-                drawSquare, drawRectangle, drawEllipse, drawCircle, fill);
+        ToolBar sidebar = new ToolBar(colorPicker, lineWidthLabel,
+                lineWidthSlider, chooseColorAtPoint, noDraw, drawStraight, 
+                drawFreehand, drawSquare, drawRectangle, drawRoundedRectangle, 
+                drawEllipse,  drawCircle, drawText, fill, zoomIn, zoomOut);
         sidebar.setOrientation(Orientation.VERTICAL);
 
         //Compiles, finalizes, and shows Layout on Stage

@@ -20,32 +20,34 @@ public class Paint extends Canvas {
 
     private Image image;
     public final static int NODRAW = 0, STRAIGHT = 1, FREEHAND = 2,
-            SQUARE = 3, RECTANGLE = 4, ELLIPSE = 5, CIRCLE = 6;
-    private boolean fill, unsavedChanges; 
-    private int lineType;
+            COLORATPOINT = 3, SQUARE = 4, RECTANGLE = 5, ROUNDEDRECTANGLE = 6,
+            ELLIPSE = 7, CIRCLE = 8, TEXT = 9;
+    private boolean fill, unsavedChanges;
+    private int lineType, zoom;
     private File saveFile;
     private GraphicsContext gc;
 
     //Easy Constructor
-    public Paint () {
-        this(Screen.getPrimary().getVisualBounds().getWidth() - 75, 
-                Screen.getPrimary().getVisualBounds().getHeight() - 75,  
+    public Paint() {
+        this(Screen.getPrimary().getVisualBounds().getWidth() - 75,
+                Screen.getPrimary().getVisualBounds().getHeight() - 75,
                 new Image(new File("src/main/java/files/javafunny.png").toURI().toString()));
-
-        Draw draw = new Draw(this);
     }
-    
+
     //Constructor
     public Paint(double width, double height, Image image) {
         super(width, height);
         this.image = image;
         this.lineType = 0;
+        this.zoom = 1;
         this.fill = false;
         this.gc = this.getGraphicsContext2D();
 
         //Draws Default Image on Canvas
         this.image = image;
         this.drawImageOnCanvas();
+
+        Draw draw = new Draw(this); //Used to draw
     }
 
     //Paints Image on Canvas with no Aspect Ratio
@@ -116,7 +118,7 @@ public class Paint extends Canvas {
             throw new RuntimeException(ex);
         }
     }
-    
+
     //Returns Image
     public Image getImage() {
         return this.image;
@@ -130,6 +132,15 @@ public class Paint extends Canvas {
     //Sets Line Type based off of Class Constants
     public void setLineType(int lineType) {
         this.lineType = lineType;
+    }
+
+    //Returns Color at Point
+    public Color getColor(double x, double y) {
+        WritableImage writableImage = new WritableImage((int) this.getWidth(), (int) this.getHeight());
+        this.snapshot(null, writableImage); //Takes snapshot of canvas
+
+        return (writableImage.getPixelReader().getColor((int) x, (int) y));
+
     }
 
     //Sets Line Color
@@ -147,34 +158,45 @@ public class Paint extends Canvas {
     public void setLineWidth(double width) {
         this.gc.setLineWidth(width / 10);
     }
-    
+
     //Gets Save Location
     public File getSaveFile() {
         return saveFile;
     }
-    
+
     //Sets Save Location
     public void setSaveFile(File saveFile) {
         this.saveFile = saveFile;
     }
-    
+
     //Returns true if there are unsavedChanges
     public boolean getUnsavedChanges() {
         return unsavedChanges;
     }
-    
+
     //Sets unsavedChanges for Draw class
     public void setUnsavedChanges(boolean unsavedChanges) {
         this.unsavedChanges = unsavedChanges;
     }
-    
+
     //Returns fill boolean
     public boolean getFill() {
         return this.fill;
     }
-    
+
     //Sets fill to true or false
     public void toggleFill() {
         this.fill = !fill;
+    }
+
+    //Changes zoom (if true, then +1. If false, then -1
+    public void adjustZoom(boolean increment) {
+        if (increment) {
+            this.setScaleX(++zoom);
+            this.setScaleY(zoom);
+        } else {
+            this.setScaleX(--zoom);
+            this.setScaleY(zoom);
+        }
     }
 }

@@ -2,6 +2,9 @@
 //Used to draw on canvas for One Stroke at a Time
 package com.nakoeppen.onestrokeatatime;
 
+import java.util.Optional;
+import javafx.scene.control.TextInputDialog;
+
 public class Draw {
 
     private double startX, startY;
@@ -12,8 +15,12 @@ public class Draw {
             if (paint.getLineType() != Paint.NODRAW) {
                 paint.getGraphicsContext2D().beginPath();
                 paint.getGraphicsContext2D().moveTo(event.getX(), event.getY());
-                if (paint.getLineType() <= 2) { //If it is not a shape
-                    paint.getGraphicsContext2D().stroke();
+                if (paint.getLineType() <= 3) { //If it is not a shape
+                    if (paint.getLineType() == Paint.COLORATPOINT) { //If
+                        paint.setLineColor(paint.getColor(event.getX(), event.getY()));
+                    } else {
+                        paint.getGraphicsContext2D().stroke();
+                    }
                 } else { //If it is a shape
                     startX = event.getX();
                     startY = event.getY();
@@ -28,7 +35,7 @@ public class Draw {
         });
         paint.setOnMouseReleased((event) -> {
             if (paint.getLineType() != Paint.NODRAW) {
-                if (paint.getLineType() < 3) { //If it is not a shape
+                if (paint.getLineType() <= 2) { //If it is not a line of some sort
                     paint.getGraphicsContext2D().lineTo(event.getX(), event.getY());
                     paint.getGraphicsContext2D().stroke();
                 } else if (paint.getLineType() == Paint.SQUARE) { //For Square
@@ -55,7 +62,15 @@ public class Draw {
                     } else {
                         paint.getGraphicsContext2D().strokeOval(startX, startY, event.getX() - startX, event.getX() - startX);
                     }
-                }
+                } else if (paint.getLineType() == Paint.TEXT) { //For Text
+                    String text = Popup.textPopup("Text Tool", "Please enter what you would like the Canvas text to be... ", null);
+                    
+                    if (paint.getFill()) { //If fill is true
+                        paint.getGraphicsContext2D().fillText(text, event.getX(), event.getY());
+                    } else {
+                        paint.getGraphicsContext2D().strokeText(text, event.getX(), event.getY());
+                    }
+                } 
                 paint.setUnsavedChanges(true);
             }
         });

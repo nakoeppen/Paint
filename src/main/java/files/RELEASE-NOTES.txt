@@ -11,11 +11,16 @@ New Features:
 -Can draw a square, rectangle, ellipse, and circle (can draw filled or unfilled)
 -Has Minor Keyboard UI controls for the File menu (Alt+f+...)
 -Renamed and reorganized some classes for better structure
+-Change Line Width with a Slider now instead of a Text Field
+-Can now choose color from a point on the Canvas
+-Can draw Text on canvas
 
 Future Planned Additions:
 -Preferences button, with config file
 -Undo/Redo Button
 -Splitting up GUI code into other class files (i.e., for Menu bar and Toolbar)
+-Clean up GUI (replace some buttons with 'Toggleable' Buttons
+-Being able to set a manual text size
 
 Known Bugs:
 -None
