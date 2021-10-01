@@ -129,7 +129,7 @@ public class App extends Application {
         colorPicker.getStyleClass().add("button");
         colorPicker.setMaxWidth(150);
         colorPicker.setOnAction((event) -> {
-            tabPane.getPaintTab().getPaint().setLineColor(colorPicker.getValue());
+            tabPane.getPaintTab().getPaint().setColor(colorPicker.getValue());
         });
 
         //Creates Buttons for sidebar
@@ -141,12 +141,16 @@ public class App extends Application {
         drawStraight.setMaxWidth(150);
         Button drawFreehand = new Button("Freehand");
         drawFreehand.setMaxWidth(150);
+        Button eraser = new Button("Eraser");
+        eraser.setMaxWidth(150);
         Button drawSquare = new Button("Square");
         drawSquare.setMaxWidth(150);
         Button drawRectangle = new Button("Rectangle");
         drawRectangle.setMaxWidth(150);
         Button drawRoundedRectangle = new Button("Rounded Rectangle");
         drawRoundedRectangle.setMaxWidth(150);
+        Button drawPolygon = new Button("Polygon");
+        drawPolygon.setMaxWidth(150);
         Button drawEllipse = new Button("Ellipse");
         drawEllipse.setMaxWidth(150);
         Button drawCircle = new Button("Circle");
@@ -159,6 +163,10 @@ public class App extends Application {
         zoomIn.setMaxWidth(150);
         Button zoomOut = new Button("Zoom Out");
         zoomOut.setMaxWidth(150);
+        Button undo = new Button("Undo");
+        undo.setMaxWidth(150);
+        Button redo = new Button("Redo");
+        redo.setMaxWidth(150);
 
         //Sets Action for Buttons on Sidebar
         chooseColorAtPoint.setOnAction((ActionEvent e) -> {
@@ -173,6 +181,9 @@ public class App extends Application {
         drawFreehand.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.FREEHAND);
         });
+        eraser.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.ERASER);
+        });
         drawSquare.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.SQUARE);
         });
@@ -181,6 +192,10 @@ public class App extends Application {
         });
         drawRoundedRectangle.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.ROUNDEDRECTANGLE);
+        });
+        drawPolygon.setOnAction((ActionEvent e) -> {
+
+            tabPane.getPaintTab().getPaint().setLineType(Paint.POLYGON);
         });
         drawEllipse.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.ELLIPSE);
@@ -200,24 +215,30 @@ public class App extends Application {
         zoomOut.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().adjustZoom(false);
         });
+        undo.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().undo();
+        });
+        redo.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().redo();
+        });
 
         //Uses Slider to change Line Width
         Label lineWidthLabel = new Label("Change Line Width");
         lineWidthLabel.setMaxWidth(150);
         Slider lineWidthSlider = new Slider(10, 300, 10);
         lineWidthSlider.setMaxWidth(150);
-        
-         //Adds action to slider value change
-        lineWidthSlider.valueProperty().addListener((ObservableValue <? extends 
-                Number> observable, Number oldValue, Number newValue) -> {
-            tabPane.getPaintTab().getPaint().setLineWidth((double)newValue);
+
+        //Adds action to slider value change
+        lineWidthSlider.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            tabPane.getPaintTab().getPaint().setLineWidth((double) newValue);
         });
 
         //Creates a Vertical Toolbar
         ToolBar sidebar = new ToolBar(colorPicker, lineWidthLabel,
-                lineWidthSlider, chooseColorAtPoint, noDraw, drawStraight, 
-                drawFreehand, drawSquare, drawRectangle, drawRoundedRectangle, 
-                drawEllipse,  drawCircle, drawText, fill, zoomIn, zoomOut);
+                lineWidthSlider, chooseColorAtPoint, noDraw, drawStraight,
+                drawFreehand, eraser, drawSquare, drawRectangle,
+                drawRoundedRectangle, drawPolygon, drawEllipse, drawCircle, 
+                drawText, fill, zoomIn, zoomOut, undo, redo);
         sidebar.setOrientation(Orientation.VERTICAL);
 
         //Compiles, finalizes, and shows Layout on Stage

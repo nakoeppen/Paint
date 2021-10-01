@@ -5,6 +5,7 @@ package com.nakoeppen.onestrokeatatime;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Stack;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.*;
@@ -19,12 +20,14 @@ import javax.imageio.ImageIO;
 public class Paint extends Canvas {
 
     private Image image;
-    public final static int NODRAW = 0, STRAIGHT = 1, FREEHAND = 2,
-            COLORATPOINT = 3, SQUARE = 4, RECTANGLE = 5, ROUNDEDRECTANGLE = 6,
-            ELLIPSE = 7, CIRCLE = 8, TEXT = 9;
+    public final static int NODRAW = 0, COLORATPOINT = 1, STRAIGHT = 2,
+            FREEHAND = 3, ERASER = 4, SQUARE = 5, RECTANGLE = 6,
+            ROUNDEDRECTANGLE = 7, POLYGON = 8, ELLIPSE = 9, CIRCLE = 10, TEXT = 11;
+    private int lineType, zoom, numberOfPolygonSides;
     private boolean fill, unsavedChanges;
-    private int lineType, zoom;
+    private Color color;
     private File saveFile;
+    private Stack<Image> undo, redo;
     private GraphicsContext gc;
 
     //Easy Constructor
@@ -40,12 +43,15 @@ public class Paint extends Canvas {
         this.image = image;
         this.lineType = 0;
         this.zoom = 1;
+        this.numberOfPolygonSides = 6;
         this.fill = false;
+        this.color = Color.BLACK;
+        this.redo = new Stack<>();
+        this.undo = new Stack<>();
         this.gc = this.getGraphicsContext2D();
 
         //Draws Default Image on Canvas
-        this.image = image;
-        this.drawImageOnCanvas();
+        importImage(image);
 
         Draw draw = new Draw(this); //Used to draw
     }
@@ -68,6 +74,7 @@ public class Paint extends Canvas {
             this.setHeight(image.getHeight());
         }
         this.gc.drawImage(this.image, 0, 0, this.getWidth(), this.getHeight()); //Draws Image
+        addToStack();
         this.unsavedChanges = true;
     }
 
@@ -78,27 +85,11 @@ public class Paint extends Canvas {
         }
     }
 
-    //Resets Canvas
-    public void resetCanvas() {
-        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        this.setWidth(screenBounds.getWidth() - 75);
-        this.setHeight(screenBounds.getHeight() - 75);
-        this.gc.clearRect(0, 0, this.getWidth(), this.getHeight());
-        this.unsavedChanges = true;
-    }
-
-    //Fits the Canvas and Image to Screen
-    public void fitToScreen() {
-        resetCanvas();
-        double widthRatio = this.getWidth() / this.image.getWidth();
-        double heightRatio = this.getHeight() / this.image.getHeight();
-        double minRatio = Math.min(widthRatio, heightRatio);
-
-        this.setWidth(this.image.getWidth() * minRatio);
-        this.setHeight(this.image.getHeight() * minRatio);
-
-        this.gc.drawImage(this.getImage(), 0, 0, this.getWidth(), this.getHeight());
-        this.unsavedChanges = true;
+    private void importImage(Image image) {
+        this.image = image;
+        if (image != null) {
+            drawImageOnCanvas();
+        }
     }
 
     //Saves Image when file is passed to it
@@ -117,6 +108,31 @@ public class Paint extends Canvas {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    //Resets Canvas
+    public void resetCanvas() {
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        this.setWidth(screenBounds.getWidth() - 75);
+        this.setHeight(screenBounds.getHeight() - 75);
+        this.gc.clearRect(0, 0, this.getWidth(), this.getHeight());
+        addToStack();
+        this.unsavedChanges = true;
+    }
+
+    //Fits the Canvas and Image to Screen
+    public void fitToScreen() {
+        resetCanvas();
+        double widthRatio = this.getWidth() / this.image.getWidth();
+        double heightRatio = this.getHeight() / this.image.getHeight();
+        double minRatio = Math.min(widthRatio, heightRatio);
+
+        this.setWidth(this.image.getWidth() * minRatio);
+        this.setHeight(this.image.getHeight() * minRatio);
+
+        this.gc.drawImage(this.getImage(), 0, 0, this.getWidth(), this.getHeight());
+        addToStack();
+        this.unsavedChanges = true;
     }
 
     //Returns Image
@@ -138,15 +154,19 @@ public class Paint extends Canvas {
     public Color getColor(double x, double y) {
         WritableImage writableImage = new WritableImage((int) this.getWidth(), (int) this.getHeight());
         this.snapshot(null, writableImage); //Takes snapshot of canvas
-
         return (writableImage.getPixelReader().getColor((int) x, (int) y));
-
     }
 
-    //Sets Line Color
-    public void setLineColor(Color color) {
-        this.gc.setStroke(color);
-        this.gc.setFill(color);
+    //Gets Color
+    public Color getColor() {
+        return this.color;
+    }
+
+    //Sets Color
+    public void setColor(Color color) {
+        this.color = color;
+        this.gc.setStroke(this.color);
+        this.gc.setFill(this.color);
     }
 
     //Gets Line Width
@@ -178,6 +198,38 @@ public class Paint extends Canvas {
     public void setUnsavedChanges(boolean unsavedChanges) {
         this.unsavedChanges = unsavedChanges;
     }
+    
+    //Returns true if there are unsavedChanges
+    public int getNumberOfPolygonSides() {
+        return this.numberOfPolygonSides;
+    }
+
+    //Sets unsavedChanges for Draw class
+    public void setNumberOfPolygonSides(int numberOfPolygonSides) {
+        this.numberOfPolygonSides = numberOfPolygonSides;
+    }
+    
+    //Returns x array for polygon
+    public double[] getXForPolygon(double startX, double startY, double radiusX, double radiusY) {
+        double radius = Math.sqrt(Math.pow((startX-radiusX),2)+Math.pow((startY-radiusY),2));
+        double[] xarray = new double[this.numberOfPolygonSides];
+        for (int i = 0; i < this.numberOfPolygonSides; i++) {
+            xarray[i] = radiusX + radius*Math.cos((2*Math.PI*i)/this.numberOfPolygonSides
+            + Math.atan2(startY-radiusY, startX-radiusX));
+        }
+        return xarray;
+    }
+    
+    //Returns y array for polygon
+    public double[] getYForPolygon(double startX, double startY, double radiusX, double radiusY) {
+        double radius = Math.sqrt(Math.pow((startX-radiusX),2)+Math.pow((startY-radiusY),2));
+        double[] yarray = new double[this.numberOfPolygonSides];
+        for (int i = 0; i < this.numberOfPolygonSides; i++) {
+            yarray[i] = radiusY + radius*Math.sin((2*Math.PI*i)/this.numberOfPolygonSides
+            + Math.atan2(startY-radiusY, startX-radiusX));
+        }
+        return yarray;
+    }
 
     //Returns fill boolean
     public boolean getFill() {
@@ -189,7 +241,31 @@ public class Paint extends Canvas {
         this.fill = !fill;
     }
 
+    //Adds to Stack
+    public void addToStack() {
+        this.redo.push(this.snapshot(null, null));
+        this.unsavedChanges = true;
+    }
+
+    //Undo action
+    public void undo() {
+        if (!this.redo.empty()) {
+            this.undo.push(this.snapshot(null, null));
+            this.importImage(this.redo.pop());
+            this.unsavedChanges = true;
+        }
+    }
+
+    //Redo action
+    public void redo() {
+        if (!this.undo.empty()) {
+            this.redo.push(this.snapshot(null, null));
+            this.importImage(this.undo.pop());
+            this.unsavedChanges = true;
+        }
+    }
     //Changes zoom (if true, then +1. If false, then -1
+
     public void adjustZoom(boolean increment) {
         if (increment) {
             this.setScaleX(++zoom);
@@ -199,4 +275,5 @@ public class Paint extends Canvas {
             this.setScaleY(zoom);
         }
     }
+
 }

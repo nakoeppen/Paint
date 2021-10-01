@@ -1,3 +1,22 @@
+SPRINT #4
+
+The software shall:
+
+REALLY CHALLENGING * have an Undo/Redo using an abstract data type ("stack" preferred/recommended); you should not use the FX built in tool!
+
+DONE * provide Blank / starter image (a tab or the tool should not have just a grey tab...)
+
+DONE * have an additional shape of your choice
+
+Done * have an eraser tool 
+
+BUGGY * be able to draw a "regular" (same side length) polygon with the user specifying the # of sides.
+
+LESS CHALLENGING AFTER UNDO/REDO * Live draw / interactive draw (you should "see" the line or shape as you draw it)
+
+CHALLENGING* [The Big One] Select a piece of the image and move it.  
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 SPRINT #3
 
 DONE ~ * A pencil tool (freehand drawing of a line) in addition to drawing a straight line  (OR, if you have this, the "straight line" tool)
@@ -7,8 +26,8 @@ DONE ~ * "Smart" save ("you've made changes...")
 DONE ~ * Multiple image file types (open and save) - at least 3.
 DONE * Keyboard UI controls (control S/Save, alt F/File menu, etc)
 DONE ~ * A text label describing the color.
-*DONE * Color "grabber"/dropper tool.
-*BUGGY * Resize canvas (and resulting image) and zoom in/out.
+DONE * Color "grabber"/dropper tool.
+DONE * Resize canvas (and resulting image) and zoom in/out.
 
 DONE * Tabs
 DONE * Sorry: forgot one: Text tool
