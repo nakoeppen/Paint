@@ -157,6 +157,8 @@ public class App extends Application {
         drawCircle.setMaxWidth(150);
         Button drawText = new Button("Text");
         drawText.setMaxWidth(150);
+        Button cutAndPaste = new Button("Cut and Paste");
+        cutAndPaste.setMaxWidth(150);
         Button fill = new Button("Fill");
         fill.setMaxWidth(150);
         Button zoomIn = new Button("Zoom In");
@@ -206,6 +208,9 @@ public class App extends Application {
         drawText.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().setLineType(Paint.TEXT);
         });
+        cutAndPaste.setOnAction((ActionEvent e) -> {
+            tabPane.getPaintTab().getPaint().setLineType(Paint.CUTANDPASTE);
+        });
         fill.setOnAction((ActionEvent e) -> {
             tabPane.getPaintTab().getPaint().toggleFill();
         });
@@ -238,7 +243,7 @@ public class App extends Application {
                 lineWidthSlider, chooseColorAtPoint, noDraw, drawStraight,
                 drawFreehand, eraser, drawSquare, drawRectangle,
                 drawRoundedRectangle, drawPolygon, drawEllipse, drawCircle, 
-                drawText, fill, zoomIn, zoomOut, undo, redo);
+                drawText, cutAndPaste, fill, zoomIn, zoomOut, undo, redo);
         sidebar.setOrientation(Orientation.VERTICAL);
 
         //Compiles, finalizes, and shows Layout on Stage

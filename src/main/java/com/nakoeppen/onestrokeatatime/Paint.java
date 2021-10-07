@@ -22,7 +22,8 @@ public class Paint extends Canvas {
     private Image image;
     public final static int NODRAW = 0, COLORATPOINT = 1, STRAIGHT = 2,
             FREEHAND = 3, ERASER = 4, SQUARE = 5, RECTANGLE = 6,
-            ROUNDEDRECTANGLE = 7, POLYGON = 8, ELLIPSE = 9, CIRCLE = 10, TEXT = 11;
+            ROUNDEDRECTANGLE = 7, POLYGON = 8, ELLIPSE = 9, CIRCLE = 10,
+            TEXT = 11, CUTANDPASTE = 12;
     private int lineType, zoom, numberOfPolygonSides;
     private boolean fill, unsavedChanges;
     private Color color;
@@ -74,21 +75,22 @@ public class Paint extends Canvas {
             this.setHeight(image.getHeight());
         }
         this.gc.drawImage(this.image, 0, 0, this.getWidth(), this.getHeight()); //Draws Image
-        addToStack();
-        this.unsavedChanges = true;
+        this.addToStack();
     }
 
+    //Imports image from a filepath
     public void importImage(String filepath) {
         this.image = new Image(filepath);
         if (image != null) {
-            drawImageOnCanvas();
+            this.drawImageOnCanvas();
         }
     }
 
+    //Imports image from an Image argument
     private void importImage(Image image) {
         this.image = image;
         if (image != null) {
-            drawImageOnCanvas();
+            this.drawImageOnCanvas();
         }
     }
 
@@ -116,8 +118,7 @@ public class Paint extends Canvas {
         this.setWidth(screenBounds.getWidth() - 75);
         this.setHeight(screenBounds.getHeight() - 75);
         this.gc.clearRect(0, 0, this.getWidth(), this.getHeight());
-        addToStack();
-        this.unsavedChanges = true;
+        this.addToStack();
     }
 
     //Fits the Canvas and Image to Screen
@@ -131,8 +132,50 @@ public class Paint extends Canvas {
         this.setHeight(this.image.getHeight() * minRatio);
 
         this.gc.drawImage(this.getImage(), 0, 0, this.getWidth(), this.getHeight());
-        addToStack();
+        this.addToStack();
+    }
+
+    //Returns the paint as an Image, cropped to specific bounds
+    public Image getImageFromBounds(int startX, int startY, int width, int height) {
+        WritableImage croppedImage = new WritableImage(this.snapshot(null, null).getPixelReader(), startX, startY, width, height);
+        return croppedImage;
+    }
+
+    //Adds to Stack
+    public void addToStack() {
+        this.undo.push(this.snapshot(null, null));
+        //this.redo.clear();
+        System.out.println(this.undo.size());
         this.unsavedChanges = true;
+    }
+
+    //Undo action
+    public void undo() {
+        if (!this.undo.empty()) { //If undo stack is not empty
+            redo.push(undo.pop());
+            importImage(undo.peek());
+            this.unsavedChanges = true;
+        }
+    }
+
+    //Redo action
+    public void redo() {
+        if (!this.redo.empty()) { //If redo stack is not empty
+            this.importImage(redo.peek());
+            undo.push(redo.pop());
+            this.unsavedChanges = true;
+        }
+    }
+
+    //Changes zoom (if true, then +1. If false, then -1
+    public void adjustZoom(boolean increment) {
+        if (increment) {
+            this.setScaleX(++zoom);
+            this.setScaleY(zoom);
+        } else {
+            this.setScaleX(--zoom);
+            this.setScaleY(zoom);
+        }
     }
 
     //Returns Image
@@ -198,7 +241,7 @@ public class Paint extends Canvas {
     public void setUnsavedChanges(boolean unsavedChanges) {
         this.unsavedChanges = unsavedChanges;
     }
-    
+
     //Returns true if there are unsavedChanges
     public int getNumberOfPolygonSides() {
         return this.numberOfPolygonSides;
@@ -208,25 +251,25 @@ public class Paint extends Canvas {
     public void setNumberOfPolygonSides(int numberOfPolygonSides) {
         this.numberOfPolygonSides = numberOfPolygonSides;
     }
-    
+
     //Returns x array for polygon
-    public double[] getXForPolygon(double startX, double startY, double radiusX, double radiusY) {
-        double radius = Math.sqrt(Math.pow((startX-radiusX),2)+Math.pow((startY-radiusY),2));
+    public double[] getXForPolygon(double startX, double startY, double centerX, double centerY) {
+        double radius = Math.sqrt(Math.pow((startX - centerX), 2) + Math.pow((startY - centerY), 2));
         double[] xarray = new double[this.numberOfPolygonSides];
-        for (int i = 0; i < this.numberOfPolygonSides; i++) {
-            xarray[i] = radiusX + radius*Math.cos((2*Math.PI*i)/this.numberOfPolygonSides
-            + Math.atan2(startY-radiusY, startX-radiusX));
+        for (int i = 0; i < xarray.length; i++) {
+            xarray[i] = centerX + radius * Math.cos((2 * Math.PI * i) / this.numberOfPolygonSides
+                    + Math.atan2(startY - centerY, startX - centerX));
         }
         return xarray;
     }
-    
+
     //Returns y array for polygon
-    public double[] getYForPolygon(double startX, double startY, double radiusX, double radiusY) {
-        double radius = Math.sqrt(Math.pow((startX-radiusX),2)+Math.pow((startY-radiusY),2));
+    public double[] getYForPolygon(double startX, double startY, double centerX, double centerY) {
+        double radius = Math.sqrt(Math.pow((startX - centerX), 2) + Math.pow((startY - centerY), 2));
         double[] yarray = new double[this.numberOfPolygonSides];
-        for (int i = 0; i < this.numberOfPolygonSides; i++) {
-            yarray[i] = radiusY + radius*Math.sin((2*Math.PI*i)/this.numberOfPolygonSides
-            + Math.atan2(startY-radiusY, startX-radiusX));
+        for (int i = 0; i < yarray.length; i++) {
+            yarray[i] = centerY + radius * Math.sin((2 * Math.PI * i) / this.numberOfPolygonSides
+                    + Math.atan2(startY - centerY, startX - centerX));
         }
         return yarray;
     }
@@ -240,40 +283,4 @@ public class Paint extends Canvas {
     public void toggleFill() {
         this.fill = !fill;
     }
-
-    //Adds to Stack
-    public void addToStack() {
-        this.redo.push(this.snapshot(null, null));
-        this.unsavedChanges = true;
-    }
-
-    //Undo action
-    public void undo() {
-        if (!this.redo.empty()) {
-            this.undo.push(this.snapshot(null, null));
-            this.importImage(this.redo.pop());
-            this.unsavedChanges = true;
-        }
-    }
-
-    //Redo action
-    public void redo() {
-        if (!this.undo.empty()) {
-            this.redo.push(this.snapshot(null, null));
-            this.importImage(this.undo.pop());
-            this.unsavedChanges = true;
-        }
-    }
-    //Changes zoom (if true, then +1. If false, then -1
-
-    public void adjustZoom(boolean increment) {
-        if (increment) {
-            this.setScaleX(++zoom);
-            this.setScaleY(zoom);
-        } else {
-            this.setScaleX(--zoom);
-            this.setScaleY(zoom);
-        }
-    }
-
 }

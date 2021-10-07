@@ -2,18 +2,27 @@
 //Used to draw on canvas for One Stroke at a Time
 package com.nakoeppen.onestrokeatatime;
 
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
+/**
+ * @author Nicholas Alexander Koeppen
+ * @since 2021-10-06
+ */
 
 public class Draw {
 
-    private double startX, startY, endX, endY;
+    private int startX, startY, endX, endY;
 
+    /**
+     * @param paint The Paint object for which this class is drawing
+     */
     public Draw(Paint paint) {
         //Sets Mouse Listener for Drawing
         paint.setOnMousePressed((event) -> {
-            if (paint.getLineType() != Paint.NODRAW) {
-                startX = event.getX();
-                startY = event.getY();
+            if (paint.getLineType() != Paint.NODRAW) { //Does not redraw
+                startX = (int) event.getX();
+                startY = (int) event.getY();
                 paint.getGraphicsContext2D().beginPath();
                 paint.getGraphicsContext2D().moveTo(startX, startY);
                 if (paint.getLineType() <= 4) { //If it is not a shape
@@ -38,13 +47,13 @@ public class Draw {
             }
         });
         paint.setOnMouseReleased((event) -> {
-            endX = event.getX();
-            endY = event.getY();
+            endX = (int) event.getX();
+            endY = (int) event.getY();
             checkAndSwitchX();
             checkAndSwitchY();
             if (paint.getLineType() > 1) { //If it is not 0 (NODRAW) or 1 (COLORCHOOSER)
                 if (paint.getLineType() < 4) { //If it is a line of some sort (STRIAGHT = 2 and FREEHAND = 3)
-                    paint.getGraphicsContext2D().lineTo(endX, endY);
+                    paint.getGraphicsContext2D().lineTo(event.getX(), event.getY());
                     paint.getGraphicsContext2D().stroke();
                 } else if (paint.getLineType() == Paint.ERASER) {
                     Color temp = paint.getColor();
@@ -100,23 +109,38 @@ public class Draw {
                     } else {
                         paint.getGraphicsContext2D().strokeText(text, endX, endY);
                     }
+                } else if (paint.getLineType() == Paint.CUTANDPASTE) { //For Cut and Paste
+                    Image image = paint.getImageFromBounds(startX, startY, this.getWidth(), this.getHeight());
+                    Color temp = paint.getColor();
+                    paint.setColor(Color.WHITE);
+                    paint.getGraphicsContext2D().fillRect(startX, startY, getWidth(), getHeight());
+                    paint.setOnMouseReleased((imageDrop) -> {
+                        paint.getGraphicsContext2D().drawImage(image, imageDrop.getX(), imageDrop.getY());
+                    });
+                    paint.setColor(temp);
                 }
                 paint.addToStack();
             }
         });
     }
 
-    public double getWidth() {
-        return Math.abs(endX - startX);
+    /**
+     * @return Width of the drawing area after a click/drag event 
+     */
+    public int getWidth() {
+        return endX - startX;
     }
 
-    public double getHeight() {
-        return Math.abs(endY - startY);
+    /**
+     * @return Height of the drawing area after a click/drag event 
+     */
+    public int getHeight() {
+        return endY - startY;
     }
 
     public void checkAndSwitchX() {
         if (this.endX < this.startX) {
-            double temp = this.endX;
+            int temp = this.endX;
             this.endX = this.startX;
             this.startX = temp;
         }
@@ -124,7 +148,7 @@ public class Draw {
 
     public void checkAndSwitchY() {
         if (this.endY < this.startY) {
-            double temp = this.endY;
+            int temp = this.endY;
             this.endY = this.startY;
             this.startY = temp;
         }

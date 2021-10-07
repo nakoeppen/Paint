@@ -1,3 +1,25 @@
+One Stroke at a Time RELEASE NOTES VERSION 0.4.1
+
+Author: Nicholas Alexander Koeppen
+
+Date: October 3rd, 2021
+
+New Features:
+-Has undo/redo
+-Can cut a portion of the Canvas and paste it elsewhere
+
+Future Planned Additions:
+-Live draw (shows shape or line while you are drawing it)
+-Refactor code to make canvas take up whole window (not just image bounds)
+-Autosave image
+
+Known Bugs:
+-Polygon does not draw inside proper bounds (always starts in top left corner)
+-Undo and redo does not work with repetitive changes
+
+Links:
+https://github.com/nkoeppen/OneStrokeAtATime.git
+-------------------------------------------------------------------------------
 One Stroke at a Time RELEASE NOTES VERSION 0.4.0
 
 Author: Nicholas Alexander Koeppen
