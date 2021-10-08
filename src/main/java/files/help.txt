@@ -9,4 +9,15 @@ screen. It is recommend that you do this for ease of use, but if you do not
 choose "Yes" to this prompt, there are scroll bars in order to navigate the 
 image as you please. Furthermore, there is still an option called "Fit to 
 Screen" under the "Edit" tab in the Top Menu Bar, which will resize the image 
-accordingly. 
+accordingly. If you would like to make edits to your canvas, you may click on
+one of the tools on the Left Toolbar. Then, after selecting a tool, you may drag
+your mouse across the screen in order to draw the line or shape on the canvas. 
+After importing an image or making more revisions to your canvas, you may save
+your image by clicking "File" and then "Save as", which will prompt you as to
+where you would like your saved image to be located. After your first save, you
+may either manually save your image by clicking "Save" or you may just let the
+image automatically save at your specified Autosave Interval, which you may set
+under the "Preferences" menu option under the "Help" menu tab. Lastly, one may 
+zoom in and out of the canvas along with set the drawing color and width by
+clicking their respective buttons on the left toolbar. 
+

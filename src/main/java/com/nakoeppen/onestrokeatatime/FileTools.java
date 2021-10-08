@@ -8,6 +8,11 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/**
+ * @author Nicholas Alexander Koeppen
+ * @since 2021-10-06
+ */
+
 public class FileTools {
 
     //Gets File for Image

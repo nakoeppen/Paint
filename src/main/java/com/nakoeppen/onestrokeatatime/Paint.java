@@ -6,6 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.*;
@@ -16,6 +19,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javax.imageio.ImageIO;
+
+/**
+ * @author Nicholas Alexander Koeppen
+ * @since 2021-10-07
+ */
 
 public class Paint extends Canvas {
 
@@ -54,6 +62,22 @@ public class Paint extends Canvas {
         //Draws Default Image on Canvas
         importImage(image);
 
+        //Autosaves image
+        TimerTask autosave = new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    if (saveFile != null && saveFile.exists() && unsavedChanges) {
+                        saveImage();
+                        System.out.println("Image saved");
+                    }
+                });
+            }
+        };
+        Timer timer = new Timer(); //Timer for autosave
+        timer.scheduleAtFixedRate(autosave, 0, ConfigProperties.getAutosaveInterval()); //Autosaves every 1min
+
+        //Draws lines and shapes on canvas
         Draw draw = new Draw(this); //Used to draw
     }
 
@@ -253,23 +277,23 @@ public class Paint extends Canvas {
     }
 
     //Returns x array for polygon
-    public double[] getXForPolygon(double startX, double startY, double centerX, double centerY) {
-        double radius = Math.sqrt(Math.pow((startX - centerX), 2) + Math.pow((startY - centerY), 2));
+    public double[] getXForPolygon(double centerX, double centerY, double endX, double endY) {
+        double radius = Math.sqrt(Math.pow((endX - centerX), 2) + Math.pow((endY - centerY), 2));
         double[] xarray = new double[this.numberOfPolygonSides];
         for (int i = 0; i < xarray.length; i++) {
             xarray[i] = centerX + radius * Math.cos((2 * Math.PI * i) / this.numberOfPolygonSides
-                    + Math.atan2(startY - centerY, startX - centerX));
+                    + Math.atan2(endY - centerY, endX - centerX));
         }
         return xarray;
     }
 
     //Returns y array for polygon
-    public double[] getYForPolygon(double startX, double startY, double centerX, double centerY) {
-        double radius = Math.sqrt(Math.pow((startX - centerX), 2) + Math.pow((startY - centerY), 2));
+    public double[] getYForPolygon(double centerX, double centerY, double endX, double endY) {
+        double radius = Math.sqrt(Math.pow((endX - centerX), 2) + Math.pow((endY - centerY), 2));
         double[] yarray = new double[this.numberOfPolygonSides];
         for (int i = 0; i < yarray.length; i++) {
             yarray[i] = centerY + radius * Math.sin((2 * Math.PI * i) / this.numberOfPolygonSides
-                    + Math.atan2(startY - centerY, startX - centerX));
+                    + Math.atan2(endY - centerY, endX - centerX));
         }
         return yarray;
     }

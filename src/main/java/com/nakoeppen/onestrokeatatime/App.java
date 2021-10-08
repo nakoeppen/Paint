@@ -2,7 +2,6 @@
 //Main class for One Stroke at a Time program
 package com.nakoeppen.onestrokeatatime;
 
-//JavaFX General
 import java.io.File;
 import java.io.FileNotFoundException;
 import javafx.application.Application;
@@ -12,9 +11,15 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
+/**
+ * @author Nicholas Alexander Koeppen
+ * @since 2021-10-06
+ */
 
 public class App extends Application {
 
@@ -22,6 +27,10 @@ public class App extends Application {
 
     //Starts the program
     public static void main(String[] args) {
+        //Reads Preferences from Config File
+        ConfigProperties.read();
+
+        //Launches Application
         launch(args);
     }
 
@@ -50,6 +59,7 @@ public class App extends Application {
         //Help
         MenuItem help = new MenuItem("Help");
         MenuItem releaseNotes = new MenuItem("Release Notes");
+        MenuItem preferences = new MenuItem("Preferences");
         MenuItem about = new MenuItem("About");
 
         //Sets action of Top MenuItems
@@ -110,6 +120,9 @@ public class App extends Application {
                 throw new RuntimeException(ex);
             }
         });
+        preferences.setOnAction((ActionEvent e) -> {
+            Popup.preferencesPopup();
+        });
         about.setOnAction((ActionEvent e) -> {
             try {
                 Popup.infoPopup(new File("src/main/java/files/about.txt"), "About");
@@ -121,7 +134,7 @@ public class App extends Application {
         //Creates and compiles the Top Menu Bar
         Menu fileMenu = new Menu("_File", null, importImage, saveAs, save, quit);
         Menu editMenu = new Menu("Edit", null, fitToScreen, clearCanvas, addTab, removeTab);
-        Menu helpMenu = new Menu("Help", null, help, releaseNotes, about);
+        Menu helpMenu = new Menu("Help", null, help, releaseNotes, preferences, about);
         MenuBar topMenu = new MenuBar(fileMenu, editMenu, helpMenu);
 
         //Change Color Feature
@@ -134,40 +147,67 @@ public class App extends Application {
 
         //Creates Buttons for sidebar
         Button chooseColorAtPoint = new Button("Color from Point");
+        chooseColorAtPoint.setTooltip(new Tooltip("Choose Color at Point"));
         chooseColorAtPoint.setMaxWidth(150);
         Button noDraw = new Button("No Drawing");
+        noDraw.setTooltip(new Tooltip("No Drawing"));
         noDraw.setMaxWidth(150);
-        Button drawStraight = new Button("Straight");
+        Button drawStraight = new Button();
+        drawStraight.setTooltip(new Tooltip("Draw Straight Line"));
+        drawStraight.setGraphic(new ImageView(new File("src/main/java/files/icons/straightline.png").toURI().toString()));
         drawStraight.setMaxWidth(150);
-        Button drawFreehand = new Button("Freehand");
+        Button drawFreehand = new Button();
+        drawFreehand.setTooltip(new Tooltip("Draw Freehand"));
+        drawFreehand.setGraphic(new ImageView(new File("src/main/java/files/icons/freehand.png").toURI().toString()));
         drawFreehand.setMaxWidth(150);
-        Button eraser = new Button("Eraser");
+        Button eraser = new Button();
+        eraser.setTooltip(new Tooltip("Eraser"));
+        eraser.setGraphic(new ImageView(new File("src/main/java/files/icons/eraser.png").toURI().toString()));
         eraser.setMaxWidth(150);
-        Button drawSquare = new Button("Square");
+        Button drawSquare = new Button();
+        drawSquare.setTooltip(new Tooltip("Draw Square"));
+        drawSquare.setGraphic(new ImageView(new File("src/main/java/files/icons/square.png").toURI().toString()));
         drawSquare.setMaxWidth(150);
-        Button drawRectangle = new Button("Rectangle");
+        Button drawRectangle = new Button();
+        drawRectangle.setTooltip(new Tooltip("Draw Rectangle"));
+        drawRectangle.setGraphic(new ImageView(new File("src/main/java/files/icons/rectangle.png").toURI().toString()));
         drawRectangle.setMaxWidth(150);
-        Button drawRoundedRectangle = new Button("Rounded Rectangle");
+        Button drawRoundedRectangle = new Button();
+        drawRoundedRectangle.setTooltip(new Tooltip("Draw Rounded Rectangle"));
+        drawRoundedRectangle.setGraphic(new ImageView(new File("src/main/java/files/icons/roundedrectangle.png").toURI().toString()));
         drawRoundedRectangle.setMaxWidth(150);
-        Button drawPolygon = new Button("Polygon");
+        Button drawPolygon = new Button();
+        drawPolygon.setTooltip(new Tooltip("Draw Polygon"));
+        drawPolygon.setGraphic(new ImageView(new File("src/main/java/files/icons/polygon.png").toURI().toString()));
         drawPolygon.setMaxWidth(150);
-        Button drawEllipse = new Button("Ellipse");
+        Button drawEllipse = new Button();
+        drawEllipse.setTooltip(new Tooltip("Draw Ellipse"));
+        drawEllipse.setGraphic(new ImageView(new File("src/main/java/files/icons/ellipse.png").toURI().toString()));
         drawEllipse.setMaxWidth(150);
-        Button drawCircle = new Button("Circle");
+        Button drawCircle = new Button();
+        drawCircle.setTooltip(new Tooltip("Draw Circle"));
+        drawCircle.setGraphic(new ImageView(new File("src/main/java/files/icons/circle.png").toURI().toString()));
         drawCircle.setMaxWidth(150);
         Button drawText = new Button("Text");
+        drawText.setTooltip(new Tooltip("Draw Text"));
         drawText.setMaxWidth(150);
         Button cutAndPaste = new Button("Cut and Paste");
+        cutAndPaste.setTooltip(new Tooltip("Cut Image and Paste"));
         cutAndPaste.setMaxWidth(150);
         Button fill = new Button("Fill");
+        fill.setTooltip(new Tooltip("Toggle Fill"));
         fill.setMaxWidth(150);
         Button zoomIn = new Button("Zoom In");
+        zoomIn.setTooltip(new Tooltip("Zoom In"));
         zoomIn.setMaxWidth(150);
         Button zoomOut = new Button("Zoom Out");
+        zoomOut.setTooltip(new Tooltip("Zoom Out"));
         zoomOut.setMaxWidth(150);
         Button undo = new Button("Undo");
+        undo.setTooltip(new Tooltip("Undo"));
         undo.setMaxWidth(150);
         Button redo = new Button("Redo");
+        redo.setTooltip(new Tooltip("Redo"));
         redo.setMaxWidth(150);
 
         //Sets Action for Buttons on Sidebar
@@ -242,7 +282,7 @@ public class App extends Application {
         ToolBar sidebar = new ToolBar(colorPicker, lineWidthLabel,
                 lineWidthSlider, chooseColorAtPoint, noDraw, drawStraight,
                 drawFreehand, eraser, drawSquare, drawRectangle,
-                drawRoundedRectangle, drawPolygon, drawEllipse, drawCircle, 
+                drawRoundedRectangle, drawPolygon, drawEllipse, drawCircle,
                 drawText, cutAndPaste, fill, zoomIn, zoomOut, undo, redo);
         sidebar.setOrientation(Orientation.VERTICAL);
 

@@ -4,6 +4,11 @@ package com.nakoeppen.onestrokeatatime;
 
 import javafx.scene.control.TabPane;
 
+/**
+ * @author Nicholas Alexander Koeppen
+ * @since 2021-10-06
+ */
+
 public class PaintTabPane extends TabPane {
 
     public PaintTabPane(PaintTab paintTab) {

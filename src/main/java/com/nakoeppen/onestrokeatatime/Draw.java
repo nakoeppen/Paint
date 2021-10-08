@@ -81,12 +81,12 @@ public class Draw {
                     }
                 } else if (paint.getLineType() == Paint.POLYGON) { //For Polygon
                     if (paint.getFill()) { //If fill is true
-                        paint.getGraphicsContext2D().fillPolygon(paint.getXForPolygon(startX, startY, getWidth() / 2, getHeight() / 2),
-                                paint.getYForPolygon(startX, startY, getWidth() / 2, getHeight() / 2),
+                        paint.getGraphicsContext2D().fillPolygon(paint.getXForPolygon(startX, startY, endX, endY),
+                                paint.getYForPolygon(startX, startY, endX, endY),
                                 paint.getNumberOfPolygonSides());
                     } else {
-                        paint.getGraphicsContext2D().strokePolygon(paint.getXForPolygon(startX, startY, getWidth() / 2, getHeight() / 2),
-                                paint.getYForPolygon(startX, startY, getWidth() / 2, getHeight() / 2),
+                        paint.getGraphicsContext2D().strokePolygon(paint.getXForPolygon(startX, startY, endX, endY),
+                                paint.getYForPolygon(startX, startY, endX, endY),
                                 paint.getNumberOfPolygonSides());
                     }
                 } else if (paint.getLineType() == Paint.ELLIPSE) { //For Ellipse

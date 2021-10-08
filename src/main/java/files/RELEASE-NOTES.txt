@@ -1,3 +1,29 @@
+One Stroke at a Time RELEASE NOTES VERSION 0.5.0
+
+Author: Nicholas Alexander Koeppen
+
+Date: October 7th, 2021
+
+New Features:
+-Autosaves Image after a specified interval (if save file has been created)
+-Implemented a properties file and ways to interact with it
+-Updated the Help Menu
+-Polygons now draw correctly
+-Added tooltips to sidebar buttons
+-Removed sidebar button labels and replaced them with icons
+-Added unit testing (buggy and currently does not work)
+
+Future Planned Additions:
+-Logging
+-Expansion of config file and preferences menu
+
+Known Bugs:
+-Undo and redo does not work with repetitive changes
+-Unit testing does not totally work
+
+Links:
+https://github.com/nkoeppen/OneStrokeAtATime.git
+-------------------------------------------------------------------------------
 One Stroke at a Time RELEASE NOTES VERSION 0.4.1
 
 Author: Nicholas Alexander Koeppen

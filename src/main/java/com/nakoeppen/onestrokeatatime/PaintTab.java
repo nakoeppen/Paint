@@ -6,6 +6,11 @@ import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 
+/**
+ * @author Nicholas Alexander Koeppen
+ * @since 2021-10-06
+ */
+
 public class PaintTab extends Tab {
 
     private String title;
