@@ -9,17 +9,21 @@ import javafx.scene.paint.Color;
  * @author Nicholas Alexander Koeppen
  * @since 2021-10-06
  */
-
 public class Draw {
 
     private int startX, startY, endX, endY;
+    private Image pasteImage = null;
 
     /**
      * @param paint The Paint object for which this class is drawing
      */
     public Draw(Paint paint) {
+
         //Sets Mouse Listener for Drawing
         paint.setOnMousePressed((event) -> {
+            if (paint.getLineType() != Paint.COPYANDPASTE && paint.getLineType() != Paint.CUTANDPASTE) {
+                pasteImage = null;
+            }
             if (paint.getLineType() != Paint.NODRAW) { //Does not redraw
                 startX = (int) event.getX();
                 startY = (int) event.getY();
@@ -32,7 +36,9 @@ public class Draw {
                         paint.getGraphicsContext2D().stroke();
                     }
                 }
+                paint.addToStack();
             }
+
         });
         paint.setOnMouseDragged((event) -> {
             if (paint.getLineType() == Paint.FREEHAND) { //For Freehand drawing
@@ -109,35 +115,47 @@ public class Draw {
                     } else {
                         paint.getGraphicsContext2D().strokeText(text, endX, endY);
                     }
-                } else if (paint.getLineType() == Paint.CUTANDPASTE) { //For Cut and Paste
-                    Image image = paint.getImageFromBounds(startX, startY, this.getWidth(), this.getHeight());
+                } else if (paint.getLineType() == Paint.COPYANDPASTE && pasteImage == null) { //For Copy and Paste (when copy part hasn't been done yet)
+                    pasteImage = paint.getImageFromBounds(startX, startY, this.getWidth(), this.getHeight());
+//                    paint.setOnMouseReleased((imageDrop) -> {
+//                        paint.getGraphicsContext2D().drawImage(image, imageDrop.getX(), imageDrop.getY());
+//                    });
+                } else if (paint.getLineType() == Paint.CUTANDPASTE && pasteImage == null) { //For Cut and Paste (when cut part hasn't been done yet)
+                    pasteImage = paint.getImageFromBounds(startX, startY, this.getWidth(), this.getHeight());
                     Color temp = paint.getColor();
                     paint.setColor(Color.WHITE);
                     paint.getGraphicsContext2D().fillRect(startX, startY, getWidth(), getHeight());
-                    paint.setOnMouseReleased((imageDrop) -> {
-                        paint.getGraphicsContext2D().drawImage(image, imageDrop.getX(), imageDrop.getY());
-                    });
                     paint.setColor(temp);
+//                    paint.setOnMouseReleased((imageDrop) -> {
+//                        paint.getGraphicsContext2D().drawImage(image, imageDrop.getX(), imageDrop.getY());
+//                    });
+                } else if (pasteImage != null) {
+                    paint.getGraphicsContext2D().drawImage(pasteImage, endX, endY);
                 }
-                paint.addToStack();
+
             }
         });
     }
 
     /**
-     * @return Width of the drawing area after a click/drag event 
+     * Gets width of drawing area
+     * @return Width of the drawing area after a click/drag event
      */
     public int getWidth() {
         return endX - startX;
     }
 
     /**
-     * @return Height of the drawing area after a click/drag event 
+     * Gets height of drawing area
+     * @return Height of the drawing area after a click/drag event
      */
     public int getHeight() {
         return endY - startY;
     }
 
+    /**
+     * Switches X if X2 is before X1
+     */
     public void checkAndSwitchX() {
         if (this.endX < this.startX) {
             int temp = this.endX;
@@ -146,6 +164,9 @@ public class Draw {
         }
     }
 
+    /**
+     * Switches Y if Y2 is before Y1
+     */
     public void checkAndSwitchY() {
         if (this.endY < this.startY) {
             int temp = this.endY;

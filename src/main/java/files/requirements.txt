@@ -1,3 +1,27 @@
+SPRINT #6
+
+The software shall:
+
+DONE * Logging with (based on) threading is required
+
+DONE * Select-Copy-paste (versus select-move-and-paste)
+
+DONE * indication of which tool is in use
+
+DONE * invent a feature (please include, as a separate upload a text file with obvious name - myfeature.txt - that has a description)
+
+DONE * Javadoc the whole (see the style guide, it should still be tight/concise not comments like "this is a comment about.." please!)
+
+DONE * Describe (again, separate upload/text file - like "mytechnicaldebt.txt") something you have refactored/fixed/polished/improved on this sprint.  
+
+DONE * Some Extra credit: implement your new feature.
+
+Some more: a second one.
+
+Help should be updated, as should tool tips.
+
+If you've already done something extra previous to this you think is good, include "myearlierextra.txt" with a description, too!)
+----------------------------------------------------------------------------------------------------------------------------------------------------------
 SPRINT #5
 
 The software shall:

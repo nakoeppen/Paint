@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -28,7 +29,12 @@ import javafx.stage.Stage;
  */
 public class Popup {
 
-    //Used to show a .txt file as a popup
+    /**
+     * Used to show a .txt file as a popup
+     * @param file .txt File for content of popup
+     * @param title Title of popup
+     * @throws FileNotFoundException
+     */
     public static void infoPopup(File file, String title) throws FileNotFoundException {
         //Does the set up for popup
         Stage popupStage = new Stage();
@@ -67,7 +73,13 @@ public class Popup {
         popupStage.show();
     }
 
-    //Returns text from dialog prompt
+    /**
+     * Returns text from dialog prompt
+     * @param title Title of dialog prompt
+     * @param contentText Content text
+     * @param defaultText Default text in prompt
+     * @return text from dialog prompt
+     */
     public static String textPopup(String title, String contentText, String defaultText) {
         TextInputDialog textInput = new TextInputDialog(defaultText);
         textInput.setTitle(title);
@@ -76,7 +88,9 @@ public class Popup {
         return text.get();
     }
 
-    //Makes a config popup
+    /**
+     * Shows and allows edits for configuration file (preferences)
+     */
     public static void preferencesPopup() {
         //Setup
         Stage popupStage = new Stage();
@@ -84,18 +98,25 @@ public class Popup {
         Scene scene = new Scene(new ScrollPane(pane), 500, 500);
 
         //Autosave Interval variable
-        Label autosaveLabel = new Label("Autosave Interval: ");
+        Label autosaveLabel = new Label("Autosave Interval (in milliseconds): ");
         TextField autosaveField = new TextField(ConfigProperties.getAutosaveInterval() + "");
 
+        //Checkbox for starting the program maximized
+        CheckBox startMaximizedCheckBox = new CheckBox("Start Program Maximized");
+        startMaximizedCheckBox.setAllowIndeterminate(false);
+        startMaximizedCheckBox.setSelected(ConfigProperties.getStartFullscreen());
+        
         //Saves all variables to ConfigProperties class and writes to config file
         Button save = new Button("Save");
         save.setOnAction((event) -> {
             long autosaveInterval = Long.parseLong(autosaveField.getText());
-            if (autosaveInterval < 5000 || autosaveInterval > 600000) {
+            boolean startFullscreen = startMaximizedCheckBox.isSelected();
+            if (autosaveInterval < 5000 || autosaveInterval > 600000) { //Check for Autosave Interval (must be an integer between 5000 and 60000 millisecods)
                 Alert alert = new Alert(Alert.AlertType.ERROR, "You can only enter a number between 5000 (5 seconds)\nand 600000 (10 minutes) for Autosave Interval...", ButtonType.OK);
                 alert.showAndWait();
             } else {
                 ConfigProperties.setAutosaveInterval(autosaveInterval);
+                ConfigProperties.setStartFullscreen(startFullscreen);
                 ConfigProperties.write();
                 popupStage.hide();
             }
@@ -104,7 +125,8 @@ public class Popup {
         //Compiles GridPane
         pane.addRow(0, new Label("Preferences:"));
         pane.addRow(1, autosaveLabel, autosaveField);
-        pane.addRow(2, save);
+        pane.addRow(2, startMaximizedCheckBox);
+        pane.addRow(3, save);
 
         //Finalizes and compiles popup
         popupStage.setScene(scene);

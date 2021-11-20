@@ -15,7 +15,12 @@ import javafx.stage.Stage;
 
 public class FileTools {
 
-    //Gets File for Image
+    /**
+     * Retrieves a file (or makes one) for importing or saving an image
+     * @param forSave a boolean that should be true if getFile() is used for saving and false if it is for importing
+     * @param stage a Stage object used to display popup
+     * @return a File object found via the computer's File Browser (can be for saving or importing)
+     */
     public static File getFile(boolean forSave, Stage stage) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(

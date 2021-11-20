@@ -1,0 +1,4 @@
+I made some variables final so that they could not be overridden or changed.
+Furthermore, I made some methods Static so that the Class overall was the 
+concept and any and all methods from the class were used from the class itself,
+not from objects of the class. 

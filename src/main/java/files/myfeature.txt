@@ -1,0 +1,5 @@
+My added feature is a preferences menu in which one can change the autosave
+interval, along with other aspects of the program. This feature has already
+been implemented, along with a configuration.properties file which changes the
+actual settings for the program. Yeah, did I mention that the settings are now
+saved even if the program closes?

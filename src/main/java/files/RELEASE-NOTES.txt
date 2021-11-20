@@ -1,3 +1,24 @@
+One Stroke at a Time RELEASE NOTES VERSION 0.6.0
+
+Author: Nicholas Alexander Koeppen
+
+Date: October 18th, 2021
+
+New Features:
+-Implemented Javadocs thoroughly throughout program
+-Implemented Logging
+-Added Copy and Paste (like Cut and Paste, but image is not cut from canvas)
+-Added fullscreen option in preferences (applies on restart)
+
+Future Planned Additions:
+-Fix Undo and Redo
+
+Known Bugs:
+-Undo and redo does not work with repetitive changes
+
+Links:
+https://github.com/nkoeppen/OneStrokeAtATime.git
+-------------------------------------------------------------------------------
 One Stroke at a Time RELEASE NOTES VERSION 0.5.0
 
 Author: Nicholas Alexander Koeppen

@@ -1,3 +1,5 @@
+//Nicholas Koeppen
+//module-info.java
 module com.nakoeppen.onestrokeatatime {
     requires javafx.controlsEmpty;
     requires javafx.controls;
@@ -6,5 +8,6 @@ module com.nakoeppen.onestrokeatatime {
     requires javafx.baseEmpty;
     requires javafx.base;
     requires javafx.swing;
+    requires java.logging;
     exports com.nakoeppen.onestrokeatatime;
 }

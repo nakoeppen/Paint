@@ -24,29 +24,39 @@ import javax.imageio.ImageIO;
  * @author Nicholas Alexander Koeppen
  * @since 2021-10-07
  */
-
 public class Paint extends Canvas {
-
-    private Image image;
+    
+    /**
+     * These are constant variables to indicate the line type for the Paint object
+     */
     public final static int NODRAW = 0, COLORATPOINT = 1, STRAIGHT = 2,
             FREEHAND = 3, ERASER = 4, SQUARE = 5, RECTANGLE = 6,
             ROUNDEDRECTANGLE = 7, POLYGON = 8, ELLIPSE = 9, CIRCLE = 10,
-            TEXT = 11, CUTANDPASTE = 12;
+            TEXT = 11, COPYANDPASTE = 12, CUTANDPASTE = 13;
     private int lineType, zoom, numberOfPolygonSides;
     private boolean fill, unsavedChanges;
     private Color color;
+    private Image image;
     private File saveFile;
     private Stack<Image> undo, redo;
     private GraphicsContext gc;
 
-    //Easy Constructor
+    /**
+     * Default Constructor
+     */
     public Paint() {
         this(Screen.getPrimary().getVisualBounds().getWidth() - 75,
                 Screen.getPrimary().getVisualBounds().getHeight() - 75,
                 new Image(new File("src/main/java/files/javafunny.png").toURI().toString()));
     }
 
-    //Constructor
+    /**
+     * Constructor which build Paint object ready for immediate use
+     *
+     * @param width Width of canvas
+     * @param height Height of canvas
+     * @param image Image that will be drawn on canvas
+     */
     public Paint(double width, double height, Image image) {
         super(width, height);
         this.image = image;
@@ -81,7 +91,9 @@ public class Paint extends Canvas {
         Draw draw = new Draw(this); //Used to draw
     }
 
-    //Paints Image on Canvas with no Aspect Ratio
+    /**
+     * Uses resetCanvas() and then Draws image on Canvas
+     */
     private void drawImageOnCanvas() {
         resetCanvas();
         //Checks to see if image is greater than max canvas bounds
@@ -102,23 +114,39 @@ public class Paint extends Canvas {
         this.addToStack();
     }
 
-    //Imports image from a filepath
+    /**
+     * Imports Image from filepath and then draws image on canvas using
+     * drawImageOnCanvas()
+     *
+     * @param filepath location of image to be imported
+     */
     public void importImage(String filepath) {
         this.image = new Image(filepath);
         if (image != null) {
             this.drawImageOnCanvas();
+        } else {
+            System.out.println("Image is null");
         }
     }
 
-    //Imports image from an Image argument
+    /**
+     * Imports image from Image object and then draws image on canvas using
+     * drawImageOnCanvas()
+     *
+     * @param image Image object to be imported
+     */
     private void importImage(Image image) {
         this.image = image;
         if (image != null) {
             this.drawImageOnCanvas();
+        } else {
+            System.out.println("Image is null");
         }
     }
 
-    //Saves Image when file is passed to it
+    /**
+     * Saves image to a previously specified File, stored as a class variable
+     */
     public void saveImage() {
         WritableImage writableImage = new WritableImage((int) this.getWidth(), (int) this.getHeight());
         this.snapshot(null, writableImage); //Takes snapshot of canvas
@@ -136,16 +164,20 @@ public class Paint extends Canvas {
         }
     }
 
-    //Resets Canvas
+    /**
+     * Resets the canvas
+     */
     public void resetCanvas() {
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         this.setWidth(screenBounds.getWidth() - 75);
         this.setHeight(screenBounds.getHeight() - 75);
         this.gc.clearRect(0, 0, this.getWidth(), this.getHeight());
-        this.addToStack();
+        //this.addToStack();
     }
 
-    //Fits the Canvas and Image to Screen
+    /**
+     * Fits the image to screen and retains aspect ratio of image
+     */
     public void fitToScreen() {
         resetCanvas();
         double widthRatio = this.getWidth() / this.image.getWidth();
@@ -156,42 +188,66 @@ public class Paint extends Canvas {
         this.setHeight(this.image.getHeight() * minRatio);
 
         this.gc.drawImage(this.getImage(), 0, 0, this.getWidth(), this.getHeight());
-        this.addToStack();
+        //this.addToStack();
     }
 
-    //Returns the paint as an Image, cropped to specific bounds
+    /**
+     * Returns a portion of the canvas stored as an Image
+     *
+     * @param startX starting x-coordinate
+     * @param startY starting y-coordinate
+     * @param width width of bound area
+     * @param height height of bound area
+     * @return Image Object of specified area
+     */
     public Image getImageFromBounds(int startX, int startY, int width, int height) {
         WritableImage croppedImage = new WritableImage(this.snapshot(null, null).getPixelReader(), startX, startY, width, height);
         return croppedImage;
     }
 
-    //Adds to Stack
+    /**
+     * Adds revisions to the canvas to an undo stack
+     */
     public void addToStack() {
-        this.undo.push(this.snapshot(null, null));
-        //this.redo.clear();
-        System.out.println(this.undo.size());
-        this.unsavedChanges = true;
+        WritableImage prev = new WritableImage((int)this.getWidth(), (int)this.getHeight());
+        this.snapshot(null, prev);
+        this.undo.push(prev);
+        //redo.clear();
     }
 
-    //Undo action
+    /**
+     * Undo the previous revision
+     */
     public void undo() {
         if (!this.undo.empty()) { //If undo stack is not empty
-            redo.push(undo.pop());
-            importImage(undo.peek());
+            WritableImage snapshot = new WritableImage((int)this.getHeight(), (int)this.getWidth());
+            this.snapshot(null, snapshot);
+            Image lastEditImage = undo.pop();
+            this.gc.drawImage(lastEditImage, 0, 0); //Draws Image
+            redo.push(snapshot);
             this.unsavedChanges = true;
         }
     }
 
-    //Redo action
+    /**
+     * Redo the previous undone revision
+     */
     public void redo() {
         if (!this.redo.empty()) { //If redo stack is not empty
-            this.importImage(redo.peek());
-            undo.push(redo.pop());
+            WritableImage snapshot = new WritableImage((int)this.getHeight(), (int)this.getWidth());
+            this.snapshot(null, snapshot);
+            Image lastEditImage = redo.pop();
+            this.gc.drawImage(lastEditImage, 0, 0); //Draws Image
+            undo.push(snapshot);
             this.unsavedChanges = true;
         }
     }
 
-    //Changes zoom (if true, then +1. If false, then -1
+    /**
+     * Changes zoom via positive or negative increment
+     *
+     * @param increment if true, then +1, else -1
+     */
     public void adjustZoom(boolean increment) {
         if (increment) {
             this.setScaleX(++zoom);
@@ -202,81 +258,134 @@ public class Paint extends Canvas {
         }
     }
 
-    //Returns Image
+    /**
+     * Returns the Image (without revisions)
+     *
+     * @return Image Object of the imported image
+     */
     public Image getImage() {
         return this.image;
     }
 
-    //Gets Line Type based off of Class Constants
+    /**
+     * Returns the drawing type as constant of Paint class (line, shape, etc.)
+     *
+     * @return current selected drawing type as a constant int of Paint class
+     */
     public int getLineType() {
         return this.lineType;
     }
 
-    //Sets Line Type based off of Class Constants
+    /**
+     * Sets the drawing type from Paint class static constants
+     * @param lineType Paint class constant indicating what drawing type
+     */
     public void setLineType(int lineType) {
         this.lineType = lineType;
     }
 
-    //Returns Color at Point
+    /**
+     * Returns Color at given point
+     * @param x x-coordinate of point
+     * @param y y-coordinate of point
+     * @return color at given point
+     */
     public Color getColor(double x, double y) {
         WritableImage writableImage = new WritableImage((int) this.getWidth(), (int) this.getHeight());
         this.snapshot(null, writableImage); //Takes snapshot of canvas
         return (writableImage.getPixelReader().getColor((int) x, (int) y));
     }
 
-    //Gets Color
+    /**
+     * Returns the currently selected drawing color
+     * @return currently selected color
+     */
     public Color getColor() {
         return this.color;
     }
 
-    //Sets Color
+    /**
+     * Sets the drawing color
+     * @param color new color to draw with
+     */
     public void setColor(Color color) {
         this.color = color;
         this.gc.setStroke(this.color);
         this.gc.setFill(this.color);
     }
 
-    //Gets Line Width
+    /**
+     * Returns line width as integer
+     * @return line width as integer
+     */
     public int getLineWidth() {
         return (int) this.gc.getLineWidth();
     }
 
-    //Sets Line Width
+    /**
+     * Sets the line width
+     * @param width new line width as double
+     */
     public void setLineWidth(double width) {
         this.gc.setLineWidth(width / 10);
     }
 
-    //Gets Save Location
+    /**
+     * Returns the save file and its location as a File object
+     * @return File object to which the canvas is saved
+     */
     public File getSaveFile() {
         return saveFile;
     }
 
-    //Sets Save Location
+    /**
+     * Sets the save file and its location
+     * @param saveFile new save file for canvas
+     */
     public void setSaveFile(File saveFile) {
         this.saveFile = saveFile;
     }
 
-    //Returns true if there are unsavedChanges
+    /**
+     * Returns true if there are unsavedChanges
+     * @return true if there are unsavedChanges
+     */
     public boolean getUnsavedChanges() {
         return unsavedChanges;
     }
 
-    //Sets unsavedChanges for Draw class
+    /**
+     * Sets unsavedChanges for Draw class
+     * @param unsavedChanges new boolean for unsaved changes (true if present)
+     */
     public void setUnsavedChanges(boolean unsavedChanges) {
         this.unsavedChanges = unsavedChanges;
     }
 
-    //Returns true if there are unsavedChanges
+    /**
+     * Returns number of polygon sides
+     * @return number of polygon sides
+     */
     public int getNumberOfPolygonSides() {
         return this.numberOfPolygonSides;
     }
 
-    //Sets unsavedChanges for Draw class
+    /**
+     * Sets the number of polygon sides
+     * @param numberOfPolygonSides new number of polygon sides
+     */
     public void setNumberOfPolygonSides(int numberOfPolygonSides) {
         this.numberOfPolygonSides = numberOfPolygonSides;
     }
 
-    //Returns x array for polygon
+    /**
+     * Returns a x-coordinate array for polygon
+     * @param centerX Center x-coordinate
+     * @param centerY Center y-coordinate
+     * @param endX End x-coordinate
+     * @param endY End y-coordinate
+     * @return x-coordinate array for polygon
+     */
     public double[] getXForPolygon(double centerX, double centerY, double endX, double endY) {
         double radius = Math.sqrt(Math.pow((endX - centerX), 2) + Math.pow((endY - centerY), 2));
         double[] xarray = new double[this.numberOfPolygonSides];
@@ -287,7 +396,14 @@ public class Paint extends Canvas {
         return xarray;
     }
 
-    //Returns y array for polygon
+    /**
+     * Returns a y-coordinate array for polygon
+     * @param centerX Center x-coordinate
+     * @param centerY Center y-coordinate
+     * @param endX End x-coordinate
+     * @param endY End y-coordinate
+     * @return y-coordinate array for polygon
+     */
     public double[] getYForPolygon(double centerX, double centerY, double endX, double endY) {
         double radius = Math.sqrt(Math.pow((endX - centerX), 2) + Math.pow((endY - centerY), 2));
         double[] yarray = new double[this.numberOfPolygonSides];
@@ -298,12 +414,17 @@ public class Paint extends Canvas {
         return yarray;
     }
 
-    //Returns fill boolean
+    /**
+     * Returns true if fill is true
+     * @return true if fill is true
+     */
     public boolean getFill() {
         return this.fill;
     }
 
-    //Sets fill to true or false
+    /**
+     * Toggles fill boolean (if true, false, etc.)
+     */
     public void toggleFill() {
         this.fill = !fill;
     }
